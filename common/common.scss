@@ -133,48 +133,6 @@ html.mobile-view body .list-controls .container {
   padding-bottom: 0.5em;
 }
 
-// 二手帖状态标签（2026-10-19）
-@mixin kuu-market-pill($bg, $fg, $dot: $fg) {
-  color: $fg;
-  background:
-    radial-gradient(circle at 0.95em 50%, $dot 0 0.26em, transparent 0.3em),
-    $bg;
-}
-
-.kuu-market-listing .tli-top-section__category {
-  .badge-category__wrapper { display: none; }
-  &::after {
-    margin: 0 0 -1em auto;
-    padding: 0.2em 0.75em 0.2em 1.55em;
-    border-radius: 999px;
-    font-size: var(--font-down-1);
-    font-weight: 600;
-    line-height: 1.4;
-    white-space: nowrap;
-  }
-}
-
-.kuu-market-status-selling .tli-top-section__category::after {
-  content: "在售";
-  @include kuu-market-pill(#e6f4ea, #1e7b3c, #2e9a52);
-}
-
-.kuu-market-status-buying .tli-top-section__category::after {
-  content: "求购";
-  @include kuu-market-pill(#e4eefa, #1f5fa8, #3478c6);
-}
-
-.kuu-market-status-sold,
-.kuu-market-status-closed,
-.kuu-market-status-expired {
-  .tli-top-section__category::after {
-    @include kuu-market-pill(#eef0f2, #6b7280, #a0a6af);
-  }
-}
-.kuu-market-status-sold .tli-top-section__category::after { content: "已出"; }
-.kuu-market-status-closed .tli-top-section__category::after { content: "已结束"; }
-.kuu-market-status-expired .tli-top-section__category::after { content: "已过期"; }
-
 // 卡片预览只显示一行（2026-10-19）
 .tli-middle-section .topic-excerpt-link {
   display: -webkit-box;
