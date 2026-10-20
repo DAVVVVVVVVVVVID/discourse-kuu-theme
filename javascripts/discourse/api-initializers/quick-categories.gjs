@@ -4,7 +4,7 @@
 // - 显示哪些分类由主题设置 quick_category_ids 决定，后台可以改
 // - 当前就在这个分类（或它的子分类，比如评分对象）时按钮显示为选中，再点一次回到「最新」
 import Component from "@glimmer/component";
-import { htmlSafe } from "@ember/template";
+import { trustHTML } from "@ember/template";
 import { apiInitializer } from "discourse/lib/api";
 import Category from "discourse/models/category";
 
@@ -29,7 +29,7 @@ class KuuQuickCategories extends Component {
           name: category.name,
           active,
           url: active ? "/latest" : category.url,
-          style: htmlSafe(`--kuu-quick-cat-color: #${category.color}`),
+          style: trustHTML(`--kuu-quick-cat-color: #${category.color}`),
         };
       });
   }
