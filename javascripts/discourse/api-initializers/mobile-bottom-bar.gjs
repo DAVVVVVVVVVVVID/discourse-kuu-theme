@@ -80,7 +80,7 @@ class KuuMobileBottomBar extends Component {
     if (typeof newTopic?.openNewTopic === "function") {
       newTopic.openNewTopic({ category, tag });
     } else {
-      this.composer.openNewTopic({ category, tags: tag ? [tag.id] : [] });
+      this.composer.openNewTopic({ category, tags: tag?.id });
     }
   }
 
