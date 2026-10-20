@@ -42,12 +42,16 @@ class KuuMobileBottomBar extends Component {
     const current = this.currentCategory;
     const active =
       !!current &&
-      (current.id === category.id || current.parent_category_id === category.id);
+      (current.id === category.id ||
+        current.parent_category_id === category.id);
     return { name: category.name, url: category.url, icon, active };
   }
 
   get left() {
-    return this.item(settings.bottom_bar_left_category, settings.bottom_bar_left_icon);
+    return this.item(
+      settings.bottom_bar_left_category,
+      settings.bottom_bar_left_icon
+    );
   }
 
   get right() {
@@ -55,6 +59,10 @@ class KuuMobileBottomBar extends Component {
       settings.bottom_bar_right_category,
       settings.bottom_bar_right_icon
     );
+  }
+
+  get centerIcon() {
+    return settings.bottom_bar_center_icon;
   }
 
   @action
@@ -97,7 +105,7 @@ class KuuMobileBottomBar extends Component {
           aria-label="发帖"
           {{on "click" this.newTopic}}
         >
-          {{dIcon settings.bottom_bar_center_icon}}
+          {{dIcon this.centerIcon}}
         </button>
 
         {{#if this.right}}
