@@ -212,3 +212,118 @@ html.mobile-view {
     }
   }
 }
+
+// ------------------------------------------------------------
+// 手机底栏（2026-10-21，配合 javascripts/.../mobile-bottom-bar.gjs）
+// 左二手市场、中间突出的圆形「+」、右评分中心。只在手机上渲染（JS 里判断 site.mobileView）
+// - iPhone 底部留出安全区（env(safe-area-inset-bottom)）
+// - 加到桌面后 core 会显示自己的「返回 / 前进」底栏（html.footer-nav-visible），我们的放在它上面
+// - 写帖子（编辑器展开）和全屏聊天时藏起来
+// - FKB Pro 在列表页的悬浮按钮（新建话题、铃铛、「最新 / 新 / 热门」切换）隐藏，由底栏代替
+// - 页面底部留出底栏的高度，帖子页的阅读进度条往上挪
+// ------------------------------------------------------------
+:root {
+  --kuu-bottom-bar-height: 3.6rem;
+}
+
+.kuu-bottom-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: z("footer-nav");
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: calc(var(--kuu-bottom-bar-height) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid var(--primary-low);
+  background: var(--secondary);
+  box-shadow: 0 -2px 10px rgb(0 0 0 / 6%);
+
+  html.footer-nav-visible & {
+    bottom: calc(var(--footer-nav-height) + env(safe-area-inset-bottom));
+    height: var(--kuu-bottom-bar-height);
+    padding-bottom: 0;
+  }
+
+  body:has(#reply-control.open) &,
+  body.has-full-page-chat & {
+    display: none;
+  }
+}
+
+.kuu-bottom-bar__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--primary-medium);
+  font-size: var(--font-down-2);
+  line-height: 1.2;
+
+  .d-icon {
+    width: 1.4em;
+    height: 1.4em;
+    font-size: var(--font-up-2);
+  }
+
+  &.--active {
+    color: $kuu-navy;
+    font-weight: 700;
+  }
+
+  &:hover,
+  &:focus {
+    color: var(--primary);
+  }
+}
+
+.kuu-bottom-bar__plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  margin-top: -1.6rem; // 比底栏高出一截
+  padding: 0;
+  border: 4px solid var(--secondary);
+  border-radius: 50%;
+  background: $kuu-navy;
+  color: $kuu-cream;
+  box-shadow: 0 4px 10px rgb(10 45 86 / 35%);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+
+  .d-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: $kuu-cream;
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+html.mobile-view {
+  body {
+    padding-bottom: calc(var(--kuu-bottom-bar-height) + env(safe-area-inset-bottom));
+  }
+
+  // FKB Pro 的悬浮按钮由底栏代替
+  .list-controls .navigation-container .navigation-controls,
+  .list-controls .navigation-container #navigation-bar {
+    display: none !important;
+  }
+
+  // 帖子页的阅读进度条（core topic-footer.scss，position: sticky）挪到底栏上面
+  .with-topic-progress {
+    bottom: calc(
+      var(--kuu-bottom-bar-height) + env(safe-area-inset-bottom) +
+        var(--composer-height, 0px)
+    );
+  }
+}

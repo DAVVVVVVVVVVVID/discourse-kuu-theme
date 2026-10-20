@@ -3,3 +3,20 @@ quick_category_ids:
   list_type: category
   default: "8|9"
   description: "帖子列表上方「全部」下拉框右边的快捷分类按钮（默认：二手市场 8、评分中心 9）。按这里的顺序显示"
+bottom_bar_left_category:
+  type: integer
+  default: 8
+  description: "手机底栏左边的分类 ID（默认 8 = 二手市场）"
+bottom_bar_left_icon:
+  default: "cart-shopping"
+  description: "手机底栏左边的图标（Font Awesome 名称）"
+bottom_bar_right_category:
+  type: integer
+  default: 9
+  description: "手机底栏右边的分类 ID（默认 9 = 评分中心）"
+bottom_bar_right_icon:
+  default: "ranking-star"
+  description: "手机底栏右边的图标（Font Awesome 名称）"
+bottom_bar_center_icon:
+  default: "plus"
+  description: "手机底栏中间发帖按钮的图标"
