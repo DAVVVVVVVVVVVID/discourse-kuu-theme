@@ -117,6 +117,54 @@ $kuu-cream: #fcf9f2;      // 米白：Logo 底色
   }
 }
 
+// 下拉框右边的快捷分类按钮（2026-10-21，配合 javascripts/.../quick-categories.gjs）
+// 小胶囊：左边一个小方块是分类自己的颜色；当前就在这个分类时用藏青实心表示选中
+.category-breadcrumb .kuu-quick-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  align-items: center;
+}
+
+.kuu-quick-cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.25em 0.8em;
+  border: 1px solid var(--primary-low);
+  border-radius: 999px;
+  background: var(--secondary);
+  color: var(--primary-high);
+  font-size: var(--font-down-1);
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+
+  &::before {
+    content: "";
+    width: 0.6em;
+    height: 0.6em;
+    border-radius: 2px;
+    background: var(--kuu-quick-cat-color);
+  }
+
+  &:hover,
+  &:focus {
+    border-color: var(--kuu-quick-cat-color);
+    color: var(--primary);
+  }
+
+  &.--active {
+    border-color: $kuu-navy;
+    background: $kuu-navy;
+    color: $kuu-cream;
+
+    &::before {
+      background: $kuu-cream;
+    }
+  }
+}
+
 // 这一行的卡片（.list-controls）上下留白收紧
 // - 电脑端：FKB Pro 给分类下拉框、「最新 / 热门」、「新建话题」上下都留了 var(--nav-space)，
 //   core 里它等于 var(--space-3)（约 12px）。只在这一行里改成 --space-2（约 8px），不影响别处

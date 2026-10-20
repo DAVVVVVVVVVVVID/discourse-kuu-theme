@@ -1,0 +1,5 @@
+quick_category_ids:
+  type: list
+  list_type: category
+  default: "8|9"
+  description: "帖子列表上方「全部」下拉框右边的快捷分类按钮（默认：二手市场 8、评分中心 9）。按这里的顺序显示"
