@@ -6,7 +6,9 @@
 
 | 文件 | 内容 |
 |---|---|
-| `common/common.scss` | 评分帖书签、顶部分类筛选、卡片预览一行、隐藏新话题小蓝点、手机上插件表单全屏 |
+| `common/common.scss` | 评分帖书签、顶部分类筛选（含快捷分类按钮的样式）、卡片预览一行、隐藏新话题小蓝点、手机上插件表单全屏 |
+| `javascripts/discourse/api-initializers/quick-categories.gjs` | 「全部 ▾」下拉框右边的快捷分类按钮（二手市场、评分中心） |
+| `settings.yml` | `quick_category_ids`：快捷按钮显示哪些分类，后台可改 |
 
 注册后等待页的倒计时、「重新发送」按钮和提示，2026-10-20 起由京大邮箱插件（discourse-kuu-kyoto-email `23ebf86`）负责，这里不再管。
 
