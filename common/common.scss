@@ -1,0 +1,267 @@
+// ------------------------------------------------------------
+// 评分帖书签（2026-10-18）
+// 帖子列表卡片上「评分中心」（分类 ID 9）的标签，改成横向书签「评分帖」：
+// 右端贴着卡片右边缘，左端是燕尾缺口。配色取自 Logo：藏青本体 + 燕尾一端一道樱花粉（10-18 方案 C）。
+// .tli-top-section__category 是 FKB Pro 卡片顶部放分类标签的地方，
+// 只在这里生效：帖子页、侧边栏、分类页里的标签不受影响。
+// 分类 ID 如果变了（比如重建分类），要改下面的 9。
+//
+// FKB Pro 的排版（fkb-c-topic-list.scss）：卡片 .main-link 四周 padding 1em、overflow: hidden；
+// 标签外层默认 margin: -1.25em 0.5em -1em auto（往上挂在卡片顶边、离右边 0.5em）。
+// ------------------------------------------------------------
+// Logo 配色（从 KUU_2.png、brand/横板2.png 取样）
+$kuu-navy: #0a2d56;       // 藏青：「京圈」大字、外圈
+$kuu-navy-light: #18467a; // 藏青渐变的亮端
+$kuu-sakura: #ed8690;     // 樱花粉
+$kuu-cream: #fcf9f2;      // 米白：Logo 底色
+
+// 外层链接：
+// - font-size: inherit —— 和卡片 .main-link 同一个字号，这样下面的 -1em 正好等于卡片的 1em 内边距，
+//   书签自动贴住卡片右边缘，不管 FKB Pro 的字号、内边距怎么变（core 和 FKB Pro 原本把这里的字号调小了，
+//   用小字号的 -1em 抵不完内边距，会留一条缝）
+// - 不再往上挂在卡片顶边；底部 -1em 和 FKB Pro 原来一样，让下面的作者那一行往上靠
+// - 阴影放在这里（下面的 clip-path 会把元素自己的阴影切掉）
+.tli-top-section__category .badge-category__wrapper:has(.badge-category[data-category-id="9"]) {
+  font-size: inherit;
+  margin: 0 -1em -1em auto;
+  filter: drop-shadow(-1px 2px 2px rgb(0 0 0 / 0.18));
+}
+
+.tli-top-section__category .badge-category[data-category-id="9"] {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4em 1.2em 0.4em 1.8em; // 左边多留一点，给燕尾缺口和樱花边
+  border-radius: 0;
+  // 燕尾一端 1.05em 是樱花粉（缺口 0.75em 深，露出一道约 0.3em 的粉边），其余是藏青渐变
+  background: linear-gradient(
+    90deg,
+    $kuu-sakura 0 1.05em,
+    $kuu-navy-light 1.05em,
+    $kuu-navy 100%
+  );
+  // 左端燕尾缺口，右端平的
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0.75em 50%);
+
+  // 原来的色块、表情（💯）、分类名都藏起来
+  &::before,
+  .badge-category__name,
+  .emoji,
+  .d-icon {
+    display: none;
+  }
+
+  // 文字挂在标签自己身上（分类名外面有 overflow: hidden，挂在它里面会被吞掉）
+  &::after {
+    content: "评分帖";
+    font-size: var(--font-0);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    color: $kuu-cream;
+  }
+}
+
+// ------------------------------------------------------------
+// 顶部分类筛选（2026-10-18）
+// 帖子列表上方那一行（core 的 bread-crumbs.gjs，<ol class="category-breadcrumb">）：
+// - 只留类别下拉框，像一个简洁的分类标题：去掉椭圆边框和底色，字大一点、加粗
+// - 箭头：core 的类别下拉框收起时故意用朝右的 angle-right、展开时用 angle-down
+//   （category-drop.js 的 caretDownIcon / caretUpIcon）。这里旋转 90°，收起时朝下、展开时朝上
+// - 标签下拉框（tag-drop）不显示
+// - 子类别下拉框（只有「评分中心」有子类别「评分对象」）不显示：评分对象应该从评分主题里点进去
+// 文字「类别」→「全部」、「移除筛选器」→「全部」不在这里，是后台「自定义文本」里改的：
+//   js.categories.categories_label、js.categories.remove_filter
+// ------------------------------------------------------------
+.category-breadcrumb {
+  // 标签下拉框、子类别下拉框不显示
+  li:has(> .tag-drop),
+  li:has(> .category-breadcrumb__subcategory-selector) {
+    display: none;
+  }
+
+  .category-breadcrumb__category-selector {
+    .select-kit-header {
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      padding-left: 0;
+      font-size: var(--font-up-1);
+      font-weight: 700;
+      color: var(--primary);
+
+      &:hover,
+      &:focus {
+        background: transparent;
+        color: var(--tertiary);
+      }
+    }
+
+    // 箭头：收起时朝下，展开时朝上
+    .select-kit-header .angle-icon {
+      margin-left: 0.35em;
+      transform: rotate(90deg);
+      transition: transform 0.15s ease;
+    }
+
+    &.is-expanded .select-kit-header .angle-icon {
+      transform: rotate(180deg);
+    }
+
+    // 表头本身的上下内边距收紧一点
+    .select-kit-header {
+      padding-top: 0.2em;
+      padding-bottom: 0.2em;
+      min-height: 0;
+    }
+  }
+}
+
+// 这一行的卡片（.list-controls）上下留白收紧
+// - 电脑端：FKB Pro 给分类下拉框、「最新 / 热门」、「新建话题」上下都留了 var(--nav-space)，
+//   core 里它等于 var(--space-3)（约 12px）。只在这一行里改成 --space-2（约 8px），不影响别处
+// - 手机端：「最新 / 热门」和「新建话题」被 FKB Pro 做成了悬浮按钮，卡片里只剩分类下拉框，
+//   但 FKB Pro 仍给卡片上下 1em 内边距（fkb-m-topic-list.scss 的 .list-controls .container）。
+//   改成上下 0.5em。html.mobile-view 是 Discourse 在手机端加的类名；前面多写 html / body
+//   是为了比 FKB Pro 的选择器更具体，确保能覆盖它
+.list-controls {
+  --nav-space: var(--space-2);
+}
+
+html.mobile-view body .list-controls .container {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+// 二手帖状态标签（2026-10-19）
+@mixin kuu-market-pill($bg, $fg, $dot: $fg) {
+  color: $fg;
+  background:
+    radial-gradient(circle at 0.95em 50%, $dot 0 0.26em, transparent 0.3em),
+    $bg;
+}
+
+.kuu-market-listing .tli-top-section__category {
+  .badge-category__wrapper { display: none; }
+  &::after {
+    margin: 0 0 -1em auto;
+    padding: 0.2em 0.75em 0.2em 1.55em;
+    border-radius: 999px;
+    font-size: var(--font-down-1);
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+}
+
+.kuu-market-status-selling .tli-top-section__category::after {
+  content: "在售";
+  @include kuu-market-pill(#e6f4ea, #1e7b3c, #2e9a52);
+}
+
+.kuu-market-status-buying .tli-top-section__category::after {
+  content: "求购";
+  @include kuu-market-pill(#e4eefa, #1f5fa8, #3478c6);
+}
+
+.kuu-market-status-sold,
+.kuu-market-status-closed,
+.kuu-market-status-expired {
+  .tli-top-section__category::after {
+    @include kuu-market-pill(#eef0f2, #6b7280, #a0a6af);
+  }
+}
+.kuu-market-status-sold .tli-top-section__category::after { content: "已出"; }
+.kuu-market-status-closed .tli-top-section__category::after { content: "已结束"; }
+.kuu-market-status-expired .tli-top-section__category::after { content: "已过期"; }
+
+// 卡片预览只显示一行（2026-10-19）
+.tli-middle-section .topic-excerpt-link {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+
+  .topic-excerpt-more {
+    display: none;
+  }
+}
+
+// 隐藏「新话题」小蓝点（2026-10-19）
+.sidebar-section-link-suffix.icon.unread,
+.topic-post-badges .badge-notification.new-topic {
+  display: none;
+}
+
+// 手机上插件表单一打开就全屏（2026-10-19）
+html.mobile-view {
+  .d-modal.kuu-market-form-modal,
+  .d-modal.kuu-new-board-modal,
+  .d-modal.kuu-add-item-modal {
+    .d-modal__container {
+      height: calc(var(--composer-vh, 1dvh) * 100);
+      max-height: calc(var(--composer-vh, 1dvh) * 100);
+      border-radius: 0;
+    }
+  }
+}
+
+
+// ------------------------------------------------------------
+// 注册后等待激活邮件的页面：5 分钟倒计时 + B 站视频（2026-10-19）
+// 配合组件 JS 栏的 theme/kuu-custom/activation-wait.gjs。倒计时期间 JS 给 <html> 加 kuu-activation-waiting，
+// 先藏起 core 的「重新发送激活邮件」按钮（activation-controls.gjs 的 .resend），「修改邮箱」不藏
+// ------------------------------------------------------------
+.kuu-activation-wait {
+  max-width: 640px;
+  margin: 1em auto 0;
+  padding: 1em;
+  text-align: center;
+  background: var(--secondary);
+  border: 1px solid var(--primary-low);
+  border-radius: var(--d-border-radius);
+
+  &__hint,
+  &__done {
+    margin: 0 0 0.5em;
+    line-height: 1.6;
+  }
+
+  &__timer {
+    font-size: 2.5em;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--tertiary);
+  }
+
+  &__player {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    margin-top: 0.75em;
+
+    iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      border-radius: var(--d-border-radius);
+    }
+  }
+
+  &__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5em;
+    margin-top: 0.5em;
+    font-size: var(--font-down-1);
+    color: var(--primary-medium);
+  }
+}
+
+html.kuu-activation-waiting .account-created .activation-controls .resend {
+  display: none;
+}

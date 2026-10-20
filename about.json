@@ -1,0 +1,9 @@
+{
+  "name": "KUU 自定义组件",
+  "component": true,
+  "about_url": "https://github.com/DAVVVVVVVVVVVID/discourse-kuu-theme",
+  "license_url": null,
+  "authors": "京圈开发组",
+  "minimum_discourse_version": null,
+  "maximum_discourse_version": null
+}
