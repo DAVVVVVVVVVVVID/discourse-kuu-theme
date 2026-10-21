@@ -1,7 +1,7 @@
 // 帖子分享图的画法（2026-10-21，Issue #12）：1080×1440（3:4），奶油色底，底部统一是 Logo + 文字 + 二维码。
 // 三种样式按 David 确认的参考图（D:\PROJECT\KUU\brand\share\share_mock.py），尺寸、颜色、字号都照抄，
-// 只有两处不同：
-// - 二维码按 Issue 要求放大到图片宽度的 1/4 以上（参考图里是 220px），底部区域相应加高、上面的封面缩短
+// 布局按 v2 参考图（D:\PROJECT\KUU\brand\share\v2\，Issue #16）：封面 968×726（4:3），底部 290px，
+// 二维码卡片约 256px（缩到一半宽、再压 JPEG 也要能识别）。和参考图不同的地方：
 // - 普通帖用文字封面时，封面上已经是大字标题，下面不再重复标题，直接写正文开头（和瀑布流的处理一致）
 // 这里只管画：图片已经由 kuu-share-data.js 读成同源的 <img>，文字已经拆成 token
 import qrcode from "./vendor/qrcode-generator.js";
@@ -29,12 +29,12 @@ const GREEN_BG = "#e6f4ea";
 const FONT_FAMILY =
   '"PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif';
 
-// 二维码的码点区域至少 270px（图片宽度的 1/4），外面再留 2 格白边
-const QR_TARGET = 300;
+// 二维码白底卡片的边长，里面四周留 2 格白边，码点区域约 220px
+const QR_CARD = 256;
 const QR_QUIET_MODULES = 2;
-const FOOTER_TOP = HEIGHT - 400;
+const FOOTER_TOP = HEIGHT - 290;
 const CONTENT_BOTTOM = FOOTER_TOP - 40;
-const COVER_HEIGHT = 560;
+const COVER_HEIGHT = 726; // 宽 968，4:3
 
 // 不能出现在行首的标点：遇到时让它留在上一行末尾（可以稍微超出一点宽度）
 const NO_LINE_START = "，。？！：；、）」』】》〉…—,.?!:;)]}%";
@@ -306,21 +306,21 @@ function drawQr(ctx, url, right, top) {
   qr.addData(url);
   qr.make();
   const n = qr.getModuleCount();
-  const cell = Math.max(1, Math.floor(QR_TARGET / n));
-  const card = cell * (n + 2 * QR_QUIET_MODULES);
-  const x = right - card;
+  const cell = QR_CARD / (n + 2 * QR_QUIET_MODULES);
+  const x = right - QR_CARD;
+  // 格子不一定是整数宽：每格的边取整再画，相邻格子之间不会出现细缝
+  const edge = (i) => Math.round((QR_QUIET_MODULES + i) * cell);
 
-  fillRoundRect(ctx, x, top, card, card, 20, WHITE);
+  fillRoundRect(ctx, x, top, QR_CARD, QR_CARD, 20, WHITE);
   ctx.fillStyle = NAVY;
-  const origin = QR_QUIET_MODULES * cell;
   for (let row = 0; row < n; row++) {
     for (let col = 0; col < n; col++) {
       if (qr.isDark(row, col)) {
         ctx.fillRect(
-          x + origin + col * cell,
-          top + origin + row * cell,
-          cell,
-          cell
+          x + edge(col),
+          top + edge(row),
+          edge(col + 1) - edge(col),
+          edge(row + 1) - edge(row)
         );
       }
     }
@@ -332,16 +332,16 @@ function drawFooter(ctx, data) {
   ctx.fillStyle = LIGHT;
   ctx.fillRect(M, FOOTER_TOP, WIDTH - 2 * M, 3);
 
-  const qrLeft = drawQr(ctx, data.url, WIDTH - M, FOOTER_TOP + 32);
+  const qrLeft = drawQr(ctx, data.url, WIDTH - M, FOOTER_TOP + 18);
   const textRight = qrLeft - 24;
 
   if (data.logo) {
-    drawCoverImage(ctx, data.logo, M, FOOTER_TOP + 56, 110, 110, 24);
+    drawCoverImage(ctx, data.logo, M, FOOTER_TOP + 52, 110, 110, 24);
   }
   const textX = data.logo ? M + 136 : M;
   singleLine(ctx, data.brand, {
     x: textX,
-    y: FOOTER_TOP + 62,
+    y: FOOTER_TOP + 58,
     width: textRight - textX,
     size: 40,
     bold: true,
@@ -349,14 +349,14 @@ function drawFooter(ctx, data) {
   });
   singleLine(ctx, data.hint, {
     x: textX,
-    y: FOOTER_TOP + 122,
+    y: FOOTER_TOP + 114,
     width: textRight - textX,
     size: 30,
     color: GREY,
   });
   singleLine(ctx, `来自 @${data.author}`, {
     x: M,
-    y: FOOTER_TOP + 236,
+    y: FOOTER_TOP + 194,
     width: textRight - M,
     size: 30,
     color: GREY,
