@@ -53,7 +53,13 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/api-initializers/mobile-waterfall.gjs` | 手机两列瀑布流，挂 `before-topic-list`；同一个列表的 core 表格加 `.kuu-waterfall-source` 类名后由 CSS 藏起来 |
 | `javascripts/discourse/components/kuu-waterfall-card.gjs` | 瀑布流卡片（封面、标题、作者、第一楼的赞；文字封面的卡片下面是正文开头 `excerpt` 而不是标题；二手价格状态；评分 / 置顶角标） |
 | `javascripts/discourse/lib/kuu-waterfall.js` | 哪些列表用瀑布流、封面选择（文字封面模板以后在 `textCoverFor` 里扩展）、分列高度估算 |
-| `settings.yml` | `quick_category_ids`、`bottom_bar_*`、`category_tabs_hidden_ids`、`waterfall_excluded_category_ids`、`text_cover_*` |
+| `javascripts/discourse/api-initializers/post-share-menu.gjs` | 帖子菜单：「复制链接」按钮换成分享下拉菜单、回复按钮换图标（`post-menu-buttons` transformer）；评分主题标题下面的「分享」（评分插件把第一楼藏了，没有帖子菜单） |
+| `javascripts/discourse/components/kuu-share-menu.gjs` | 分享下拉菜单：复制链接、保存分享图（只在公开帖子） |
+| `javascripts/discourse/components/kuu-share-image-modal.gjs` | 「保存分享图」弹窗：生成、显示（data URL，微信里能长按）、电脑下载、Web Share |
+| `javascripts/discourse/lib/kuu-share-image.js` | 分享图的 canvas 画法（1080×1440，三种样式，照 David 确认的参考图 `D:\PROJECT\KUU\brand\share\`）、中文换行 |
+| `javascripts/discourse/lib/kuu-share-data.js` | 分享图的数据：帖子、二手 `kuu_market_listing`、评分 `/kuu-ratings/boards/:id/items?sort=score`；图片都 fetch 成 blob 再画 |
+| `javascripts/discourse/lib/vendor/qrcode-generator.js` | 第三方二维码库（MIT），原样拷贝，eslint / prettier 跳过 |
+| `settings.yml` | `quick_category_ids`、`bottom_bar_*`、`category_tabs_hidden_ids`、`waterfall_excluded_category_ids`、`text_cover_*`、`post_share_icon`、`post_reply_icon`、`share_image_*` |
 | `about.json` | modifier `topic_thumbnail_sizes: [[600, 1200]]`：列表数据里才有图片宽高和小缩略图（瀑布流按原图比例要用）；`serialize_topic_excerpts`：列表里带摘要（FKB Pro 也开了，这里再开一次，不依赖它） |
 
 和插件的配合：
@@ -75,5 +81,9 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - 本地把组件更新到开发环境（本地组件 ID 2）：`d/rails runner 'RemoteTheme.import_theme_from_directory("/src/plugins/discourse-kuu-theme", theme_id: 2)'`（会跳过 node_modules）。**本地分类 ID 和线上不一样**（本地二手 7、评分 5），本地的主题设置要改成本地 ID。改了 CSS 后如果页面还是旧样式，重启 `d/dev`
 - `d/dev` 要 TTY，后台跑用 `docker exec -u discourse:discourse -w /src discourse_dev bin/dev`
 - Playwright 截图不能 `waitUntil: "networkidle"`（Discourse 的长轮询一直不停），等页面元素出现（比如 `.kuu-waterfall`）
+- 本地用别的身份测（普通用户、管理员）：启动 `bin/dev` 时加 `-e DISCOURSE_DEV_ALLOW_ANON_TO_IMPERSONATE=1`，然后打开 `/session/用户名/become`
+- 停开发服务器别用 `pkill -f bin/dev`（会把执行它的 shell 自己也匹配上），用 `ps` 找进程号再 kill；`kill -9` 后前端构建进程 `rolldown.mjs` 可能还在，下次启动会报「already running」，要一起停掉
+- canvas 只能导出没被「污染」的图：画进分享图的图片都要先 `fetch` 成 blob（`kuu-share-data.js` 的 `loadImage`），外链图读不到就当没有图
+- 分享图二维码的检查：`~/discourse/tmp/kuu-shots/` 里用 jsQR 在浏览器里识别（缩到 1/4 宽、再压 JPEG 也要能识别），但**微信实机扫码只能 David 测**
 - WSL 内存小（约 5GB），开发服务器、Playwright、别的会话跑的 rspec 同时跑会把容器拖垮（`can't alloc thread`），截图脚本崩了要清掉残留的 chrome 进程
 - 站点的 CSP 没有限制 `frame-src`；B 站嵌入播放器在手机上显示「视频失效」（2026-10-20 试过 5 种写法都不行），别再走这条路

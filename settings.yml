@@ -55,3 +55,18 @@ text_cover_image:
 text_cover_text_color:
   default: "#0A2D56"
   description: "文字封面上标题的颜色（用了上面的背景图时生效）"
+post_share_icon:
+  default: "arrow-up-from-bracket"
+  description: "帖子菜单里分享按钮的图标（Font Awesome 名称）。点开是「复制链接」「保存分享图」"
+post_reply_icon:
+  default: "far-comment"
+  description: "帖子菜单里回复按钮的图标（Font Awesome 名称）"
+share_image_site_url:
+  default: "https://kyotooo.com"
+  description: "分享图二维码里的网址开头（二维码指向 网址/t/帖子ID）。留空时用当前访问的网址"
+share_image_brand:
+  default: "京圈 · 京大社区"
+  description: "分享图底部 Logo 右边的大字"
+share_image_hint:
+  default: "长按识别二维码，查看完整内容"
+  description: "分享图底部大字下面的提示"
