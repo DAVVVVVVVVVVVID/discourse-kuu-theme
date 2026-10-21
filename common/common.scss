@@ -332,3 +332,294 @@ html.mobile-view {
     );
   }
 }
+
+// ------------------------------------------------------------
+// 手机顶部分类标签（2026-10-21，Issue #9，配合 javascripts/.../mobile-category-tabs.gjs）
+// 代替手机上的「全部 ▾」下拉框：横向滑动，当前标签加粗、下面一条樱花粉短横线；「⌄」展开成多行。
+// core 的下拉框在有这一行时藏起来（标签页不渲染这一行，下拉框照常显示）。
+// FKB Pro 给下拉框写了 display: flex !important（fkb-m-topic-list.scss），
+// 这里的选择器要比它更具体才盖得住
+// ------------------------------------------------------------
+html.mobile-view
+  body
+  .list-controls
+  .container
+  .navigation-container:has(.kuu-cat-tabs)
+  ol.category-breadcrumb {
+  display: none !important;
+}
+
+.kuu-cat-tabs {
+  display: flex;
+  gap: 0.25em;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.kuu-cat-tabs__list {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 1.1em;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .kuu-cat-tabs.--expanded & {
+    flex-wrap: wrap;
+    row-gap: 0.4em;
+    overflow-x: visible;
+  }
+}
+
+.kuu-cat-tabs__item {
+  flex: none;
+}
+
+.kuu-cat-tabs__link {
+  position: relative;
+  display: block;
+  padding: 0.35em 0 0.55em;
+  color: var(--primary-medium);
+  font-size: var(--font-0);
+  line-height: 1.3;
+  white-space: nowrap;
+
+  &.--active {
+    color: var(--primary);
+    font-weight: 700;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 1.2em;
+      height: 3px;
+      border-radius: 2px;
+      background: $kuu-sakura;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+.kuu-cat-tabs__toggle {
+  flex: none;
+  padding: 0.35em 0.25em;
+  border: none;
+  background: transparent;
+  color: var(--primary-medium);
+  line-height: 1.3;
+
+  .d-icon {
+    transition: transform 0.15s ease;
+  }
+
+  .kuu-cat-tabs.--expanded & .d-icon {
+    transform: rotate(180deg);
+  }
+}
+
+// ------------------------------------------------------------
+// 手机两列瀑布流（2026-10-21，Issue #9，配合 javascripts/.../mobile-waterfall.gjs）
+// - core 的表格（加了 .kuu-waterfall-source 的那一个）在手机上藏起来，换成两列卡片；
+//   「二手市场」「评分中心」分类页不加这个类名，保留插件的卡片
+// - 封面按原图比例（JS 算好放在 --kuu-wf-ratio，限制在 3:4 ~ 4:3），高度用 padding-top 撑出来，
+//   图片绝对定位铺满（iPhone Safari 的坑，见 CLAUDE.md）
+// - 圆角写固定值：FKB Pro 的 --d-default-border-radius 是 1em
+// - 列间距 8px 和 JS 里的 GAP 一致
+// ------------------------------------------------------------
+html.mobile-view {
+  .topic-list.kuu-waterfall-source {
+    display: none;
+  }
+
+  .kuu-waterfall {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding-bottom: 8px;
+  }
+
+  .kuu-waterfall__column {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+}
+
+.kuu-wf-card {
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--secondary);
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+
+  &:hover,
+  &:focus,
+  &:visited {
+    color: var(--primary);
+  }
+
+  &.--ended .kuu-wf-card__cover {
+    filter: grayscale(0.8);
+    opacity: 0.7;
+  }
+}
+
+.kuu-wf-card__cover {
+  position: relative;
+  display: block;
+  height: 0;
+  padding-top: var(--kuu-wf-ratio, 133%);
+  background-color: var(--primary-low);
+  background-position: center;
+  background-size: cover;
+
+  // 只管封面图本身，标题里的 emoji 也是 <img>
+  > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// 文字封面：模板背景（或品牌色）+ 居中的大号标题，最多 5 行，长英文单词也能断行
+.kuu-wf-card__cover-title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1em 0.9em;
+  text-align: center;
+}
+
+.kuu-wf-card__cover-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  overflow: hidden;
+  font-size: var(--font-up-2);
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+
+  img.emoji {
+    width: 1.1em;
+    height: 1.1em;
+  }
+}
+
+.kuu-wf-card__badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  background: rgb(10 45 86 / 85%); // 藏青
+  color: $kuu-cream;
+  font-size: var(--font-down-2);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.kuu-wf-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+
+.kuu-wf-card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: var(--font-down-1);
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+
+  img.emoji {
+    width: 1.1em;
+    height: 1.1em;
+  }
+}
+
+.kuu-wf-card__market {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  align-items: center;
+}
+
+.kuu-wf-card__price {
+  color: #e4393c;
+  font-size: var(--font-0);
+  font-weight: 700;
+}
+
+.kuu-wf-card__status {
+  flex: none;
+  padding: 0 0.4em;
+  border: 1px solid currentcolor;
+  border-radius: 4px;
+  color: var(--primary-medium);
+  font-size: var(--font-down-2);
+  line-height: 1.5;
+  white-space: nowrap;
+
+  &.kuu-market-status-selling,
+  &.kuu-market-status-buying {
+    color: $kuu-navy;
+  }
+}
+
+.kuu-wf-card__meta {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--primary-medium);
+  font-size: var(--font-down-2);
+}
+
+.kuu-wf-card__author {
+  display: flex;
+  gap: 0.35em;
+  align-items: center;
+  min-width: 0;
+
+  .avatar {
+    flex: none;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.kuu-wf-card__username {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kuu-wf-card__likes {
+  display: flex;
+  flex: none;
+  gap: 0.25em;
+  align-items: center;
+}
