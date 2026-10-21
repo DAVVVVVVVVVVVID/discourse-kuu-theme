@@ -96,14 +96,13 @@ export function coverFor(topic, siteSettings) {
 
 // 分列用的卡片高度估算（px）。只看已有的数据，不量 DOM：同样的帖子永远算出同样的高度，
 // 加载更多时前面的卡片不会换列
-export function estimateCardHeight(topic, ratio, cardWidth) {
+export function estimateCardHeight(topic, cover, cardWidth) {
   const textWidth = cardWidth - 16;
-  // 中文一个字约 15px 宽，标题最多两行
-  const title = topic.kuu_market_card?.item_name || topic.title || "";
-  const titleLines = Math.min(
-    2,
-    Math.max(1, Math.ceil((title.length * 15) / textWidth))
-  );
+  // 中文一个字约 15px 宽；标题、摘要都最多两行。文字封面下面是摘要（可能没有），其他是标题
+  const text = cover.textCover
+    ? topic.excerpt || ""
+    : topic.kuu_market_card?.item_name || topic.title || "";
+  const lines = Math.min(2, Math.ceil((text.length * 15) / textWidth));
   const marketRow = topic.kuu_market_card ? 24 : 0;
-  return cardWidth * ratio + 16 + titleLines * 21 + marketRow + 30;
+  return cardWidth * cover.ratio + 16 + lines * 21 + marketRow + 30;
 }

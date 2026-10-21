@@ -51,10 +51,10 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/api-initializers/mobile-bottom-bar.gjs` | 手机底栏：首页、二手、中间「+」发帖、评分、我的；代替 FKB Pro 列表页的悬浮按钮 |
 | `javascripts/discourse/api-initializers/mobile-category-tabs.gjs` | 手机顶部分类标签（代替「全部 ▾」下拉框），挂 `after-breadcrumbs` |
 | `javascripts/discourse/api-initializers/mobile-waterfall.gjs` | 手机两列瀑布流，挂 `before-topic-list`；同一个列表的 core 表格加 `.kuu-waterfall-source` 类名后由 CSS 藏起来 |
-| `javascripts/discourse/components/kuu-waterfall-card.gjs` | 瀑布流卡片（封面、标题、作者、第一楼的赞；二手价格状态；评分 / 置顶角标） |
+| `javascripts/discourse/components/kuu-waterfall-card.gjs` | 瀑布流卡片（封面、标题、作者、第一楼的赞；文字封面的卡片下面是正文开头 `excerpt` 而不是标题；二手价格状态；评分 / 置顶角标） |
 | `javascripts/discourse/lib/kuu-waterfall.js` | 哪些列表用瀑布流、封面选择（文字封面模板以后在 `textCoverFor` 里扩展）、分列高度估算 |
 | `settings.yml` | `quick_category_ids`、`bottom_bar_*`、`category_tabs_hidden_ids`、`waterfall_excluded_category_ids`、`text_cover_*` |
-| `about.json` | modifier `topic_thumbnail_sizes: [[600, 1200]]`：列表数据里才有图片宽高和小缩略图（瀑布流按原图比例要用） |
+| `about.json` | modifier `topic_thumbnail_sizes: [[600, 1200]]`：列表数据里才有图片宽高和小缩略图（瀑布流按原图比例要用）；`serialize_topic_excerpts`：列表里带摘要（FKB Pro 也开了，这里再开一次，不依赖它） |
 
 和插件的配合：
 - 底栏的「+」调用 `discourse-kuu-new-topic` 插件的 `service:kuu-new-topic` 的 `openNewTopic({ category, tag })`，没有时退回 `composer.openNewTopic`

@@ -1,6 +1,7 @@
 // 瀑布流里的一张卡片（Issue #9）：封面（原图比例或文字封面）、标题两行、作者和第一楼的赞。
+// 文字封面上已经是大字标题，下面改成正文开头两行（没有摘要就不显示，PR #11 审核 David 定）。
 // 二手帖标题换成商品名（标题里本来带着【出售】和价格，和下面的价格、状态重复），
-// 标题下面加价格和状态；评分主题、置顶帖在封面上加角标。
+// 下面加价格和状态；评分主题、置顶帖在封面上加角标。
 // 整张卡片是一个链接，作者不单独做链接（链接里不能再套链接）
 import Component from "@glimmer/component";
 import { trustHTML } from "@ember/template";
@@ -94,13 +95,21 @@ export default class KuuWaterfallCard extends Component {
       </span>
 
       <span class="kuu-wf-card__body">
-        <span class="kuu-wf-card__title">
-          {{#if this.itemName}}
-            {{this.itemName}}
-          {{else}}
-            {{trustHTML this.topic.fancyTitle}}
+        {{#if this.cover.textCover}}
+          {{#if this.topic.hasExcerpt}}
+            <span class="kuu-wf-card__excerpt">
+              {{trustHTML this.topic.escapedExcerpt}}
+            </span>
           {{/if}}
-        </span>
+        {{else}}
+          <span class="kuu-wf-card__title">
+            {{#if this.itemName}}
+              {{this.itemName}}
+            {{else}}
+              {{trustHTML this.topic.fancyTitle}}
+            {{/if}}
+          </span>
+        {{/if}}
 
         {{#if this.market}}
           <span class="kuu-wf-card__market">

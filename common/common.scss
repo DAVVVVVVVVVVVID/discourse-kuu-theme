@@ -560,6 +560,24 @@ html.mobile-view {
   }
 }
 
+// 文字封面卡片下面的正文开头（封面上已经有标题）
+.kuu-wf-card__excerpt {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  color: var(--primary-high);
+  font-size: var(--font-down-1);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+
+  img.emoji {
+    width: 1.1em;
+    height: 1.1em;
+  }
+}
+
 .kuu-wf-card__market {
   display: flex;
   flex-wrap: wrap;

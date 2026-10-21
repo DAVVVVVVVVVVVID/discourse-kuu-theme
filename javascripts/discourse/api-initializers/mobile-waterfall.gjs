@@ -62,7 +62,7 @@ class KuuWaterfall extends Component {
       const column =
         columns[0].height <= columns[1].height ? columns[0] : columns[1];
       column.items.push({ topic, cover });
-      column.height += estimateCardHeight(topic, cover.ratio, cardWidth) + GAP;
+      column.height += estimateCardHeight(topic, cover, cardWidth) + GAP;
     }
 
     return columns;
