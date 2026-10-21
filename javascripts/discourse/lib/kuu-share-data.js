@@ -164,7 +164,7 @@ async function loadTextCover(topic) {
 }
 
 // 评分主题（不包括评分分类的说明帖）
-export function isBoard(topic, siteSettings) {
+function isBoard(topic, siteSettings) {
   const boardCategoryId = parseInt(siteSettings.kuu_ratings_board_category, 10);
   return (
     !!boardCategoryId &&

@@ -695,9 +695,9 @@ html.mobile-view {
   width: 100%;
 }
 
-// 评分主题标题下面的「分享」：和分类标签在同一行
-.kuu-board-share {
-  margin-left: 0.5em;
-  padding: 0.15em 0.5em;
-  color: var(--primary-medium);
+// 话题最底部 core 的「分享」（打开 core 分享窗口，带邀请）藏起来，
+// 换成 topic-footer-share.js 注册的分享菜单按钮（2026-10-21，Issue #14）。
+// 用 id 选：我们的按钮为了快捷键也带 share-and-invite 类名
+#topic-footer-button-share-and-invite {
+  display: none;
 }
