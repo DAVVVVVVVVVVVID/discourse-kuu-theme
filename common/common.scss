@@ -10,10 +10,10 @@
 // 标签外层默认 margin: -1.25em 0.5em -1em auto（往上挂在卡片顶边、离右边 0.5em）。
 // ------------------------------------------------------------
 // Logo 配色（从 KUU_2.png、brand/横板2.png 取样）
-$kuu-navy: #0a2d56;       // 藏青：「京圈」大字、外圈
+$kuu-navy: #0a2d56; // 藏青：「京圈」大字、外圈
 $kuu-navy-light: #18467a; // 藏青渐变的亮端
-$kuu-sakura: #ed8690;     // 樱花粉
-$kuu-cream: #fcf9f2;      // 米白：Logo 底色
+$kuu-sakura: #ed8690; // 樱花粉
+$kuu-cream: #fcf9f2; // 米白：Logo 底色
 
 // 外层链接：
 // - font-size: inherit —— 和卡片 .main-link 同一个字号，这样下面的 -1em 正好等于卡片的 1em 内边距，
@@ -21,7 +21,8 @@ $kuu-cream: #fcf9f2;      // 米白：Logo 底色
 //   用小字号的 -1em 抵不完内边距，会留一条缝）
 // - 不再往上挂在卡片顶边；底部 -1em 和 FKB Pro 原来一样，让下面的作者那一行往上靠
 // - 阴影放在这里（下面的 clip-path 会把元素自己的阴影切掉）
-.tli-top-section__category .badge-category__wrapper:has(.badge-category[data-category-id="9"]) {
+.tli-top-section__category
+  .badge-category__wrapper:has(.badge-category[data-category-id="9"]) {
   font-size: inherit;
   margin: 0 -1em -1em auto;
   filter: drop-shadow(-1px 2px 2px rgb(0 0 0 / 0.18));
@@ -32,6 +33,7 @@ $kuu-cream: #fcf9f2;      // 米白：Logo 底色
   align-items: center;
   padding: 0.4em 1.2em 0.4em 1.8em; // 左边多留一点，给燕尾缺口和樱花边
   border-radius: 0;
+
   // 燕尾一端 1.05em 是樱花粉（缺口 0.75em 深，露出一道约 0.3em 的粉边），其余是藏青渐变
   background: linear-gradient(
     90deg,
@@ -39,6 +41,7 @@ $kuu-cream: #fcf9f2;      // 米白：Logo 底色
     $kuu-navy-light 1.05em,
     $kuu-navy 100%
   );
+
   // 左端燕尾缺口，右端平的
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0.75em 50%);
 
@@ -310,7 +313,9 @@ html.mobile-view {
 
 html.mobile-view {
   body {
-    padding-bottom: calc(var(--kuu-bottom-bar-height) + env(safe-area-inset-bottom));
+    padding-bottom: calc(
+      var(--kuu-bottom-bar-height) + env(safe-area-inset-bottom)
+    );
   }
 
   // FKB Pro 的悬浮按钮由底栏代替

@@ -21,6 +21,7 @@
 2. PR 里写清楚：改了什么、为什么、电脑和手机上的截图
 3. `main` 受保护：必须走 PR，David 批准后才能合并
 4. 合并后由 David 在论坛后台（外观 → 组件 → KUU 自定义组件 →「检查更新」/「更新」）拉取，**合并不会自动上线**
+5. 提交前跑 `pnpm install && pnpm lint`；GitHub 上的 CI 会再查一遍。给 Claude Code 的说明见 `CLAUDE.md`
 
 ### 本地预览
 

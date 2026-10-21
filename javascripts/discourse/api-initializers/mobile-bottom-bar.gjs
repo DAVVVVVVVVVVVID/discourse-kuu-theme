@@ -23,8 +23,8 @@ import dIcon from "discourse/ui-kit/helpers/d-icon";
 const KuuBottomBarItem = <template>
   {{#if @item}}
     <a
-      href={{@item.url}}
       class="kuu-bottom-bar__item {{if @item.active '--active'}}"
+      href={{@item.url}}
     >
       {{dIcon @item.icon}}
       <span class="kuu-bottom-bar__label">{{@item.label}}</span>
@@ -49,19 +49,6 @@ class KuuMobileBottomBar extends Component {
     // 帖子页：用帖子所在的分类来高亮（发帖时不预选，弹选择框）
     const categoryId = this.router.currentRoute?.attributes?.category_id;
     return categoryId ? Category.findById(categoryId) : null;
-  }
-
-  categoryItem(categoryId, icon, label) {
-    const category = Category.findById(parseInt(categoryId, 10));
-    if (!category) {
-      return null;
-    }
-    const current = this.currentCategory;
-    const active =
-      !!current &&
-      (current.id === category.id ||
-        current.parent_category_id === category.id);
-    return { label, url: category.url, icon, active };
   }
 
   get home() {
@@ -114,6 +101,19 @@ class KuuMobileBottomBar extends Component {
     return settings.bottom_bar_center_icon;
   }
 
+  categoryItem(categoryId, icon, label) {
+    const category = Category.findById(parseInt(categoryId, 10));
+    if (!category) {
+      return null;
+    }
+    const current = this.currentCategory;
+    const active =
+      !!current &&
+      (current.id === category.id ||
+        current.parent_category_id === category.id);
+    return { label, url: category.url, icon, active };
+  }
+
   @action
   newTopic() {
     if (!this.currentUser) {
@@ -135,14 +135,14 @@ class KuuMobileBottomBar extends Component {
 
   <template>
     {{#if this.site.mobileView}}
-      <nav class="kuu-bottom-bar" aria-label="快捷导航">
+      <nav aria-label="快捷导航" class="kuu-bottom-bar">
         <KuuBottomBarItem @item={{this.home}} />
         <KuuBottomBarItem @item={{this.left}} />
 
         <button
-          type="button"
-          class="kuu-bottom-bar__plus"
           aria-label="发帖"
+          class="kuu-bottom-bar__plus"
+          type="button"
           {{on "click" this.newTopic}}
         >
           {{dIcon this.centerIcon}}
