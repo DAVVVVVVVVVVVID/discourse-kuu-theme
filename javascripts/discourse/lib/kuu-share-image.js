@@ -21,9 +21,15 @@ const RED = "#e5484d";
 const GOLD = "#f5a623";
 const SILVER = "#b0b8c2";
 const BRONZE = "#cd8c5a";
-const GREEN = "#1e7b3c";
-const GREEN_DOT = "#2e9a52";
-const GREEN_BG = "#e6f4ea";
+
+// 二手状态标签的颜色，和二手插件列表卡片的 .kuu-market-card__status 一致（已出 / 已购买是藏青）
+const MARKET_STATUS_COLORS = {
+  selling: { bg: "#e6f4ea", fg: "#1e7b3c", dot: "#2e9a52" },
+  buying: { bg: "#e4eefa", fg: "#1f5fa8", dot: "#3478c6" },
+  sold: { bg: "#e3e8ef", fg: NAVY, dot: NAVY },
+  closed: { bg: "#e3e8ef", fg: NAVY, dot: NAVY },
+};
+const MARKET_STATUS_DEFAULT = { bg: "#eef0f2", fg: "#6b7280", dot: "#a0a6af" };
 
 // 中文用设备自带字体：iPhone 苹方、Mac 冬青黑、Android 思源黑体、Windows 微软雅黑
 const FONT_FAMILY =
@@ -426,9 +432,7 @@ function drawMarket(ctx, data) {
     data.status.label,
     M + priceWidth + 32,
     y + 18,
-    data.status.active
-      ? { bg: GREEN_BG, fg: GREEN, dot: GREEN_DOT }
-      : { bg: LIGHT, fg: GREY, dot: GREY }
+    MARKET_STATUS_COLORS[data.status.key] || MARKET_STATUS_DEFAULT
   );
   y += 124;
 
