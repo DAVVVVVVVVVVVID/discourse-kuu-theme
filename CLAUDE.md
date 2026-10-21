@@ -86,6 +86,6 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - 本地用别的身份测（普通用户、管理员）：启动 `bin/dev` 时加 `-e DISCOURSE_DEV_ALLOW_ANON_TO_IMPERSONATE=1`，然后打开 `/session/用户名/become`
 - 停开发服务器别用 `pkill -f bin/dev`（会把执行它的 shell 自己也匹配上），用 `ps` 找进程号再 kill；`kill -9` 后前端构建进程 `rolldown.mjs` 可能还在，下次启动会报「already running」，要一起停掉
 - canvas 只能导出没被「污染」的图：画进分享图的图片都要先 `fetch` 成 blob（`kuu-share-data.js` 的 `loadImage`），外链图读不到就当没有图
-- 分享图二维码的检查：`~/discourse/tmp/kuu-shots/` 里用 jsQR 在浏览器里识别（缩到 1/4 宽、再压 JPEG 也要能识别），但**微信实机扫码只能 David 测**
+- 分享图二维码的检查：`~/discourse/tmp/kuu-shots/` 里的 qr-check.mjs 用 jsQR 在浏览器里识别（验收标准：整张图缩到 540px 宽、再压成质量 50 的 JPEG 能识别，Issue #16），但**微信实机扫码只能 David 测**
 - WSL 内存小（约 5GB），开发服务器、Playwright、别的会话跑的 rspec 同时跑会把容器拖垮（`can't alloc thread`），截图脚本崩了要清掉残留的 chrome 进程
 - 站点的 CSP 没有限制 `frame-src`；B 站嵌入播放器在手机上显示「视频失效」（2026-10-20 试过 5 种写法都不行），别再走这条路
