@@ -46,10 +46,10 @@ class KuuQuickCategories extends Component {
       <div class="kuu-quick-cats">
         {{#each this.items as |item|}}
           <a
-            href={{item.url}}
             class="kuu-quick-cat {{if item.active '--active'}}"
-            style={{item.style}}
             data-category-id={{item.id}}
+            href={{item.url}}
+            style={{item.style}}
           >{{item.name}}</a>
         {{/each}}
       </div>
