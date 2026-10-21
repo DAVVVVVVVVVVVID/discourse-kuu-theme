@@ -56,6 +56,7 @@ function hideFromSidebarCategories(ids) {
 
 export default apiInitializer((api) => {
   const site = api.container.lookup("service:site");
+  const discovery = api.container.lookup("service:discovery");
   const hiddenIds = standaloneCategoryIdsWithChildren(site);
 
   hideFromSidebarCategories(hiddenIds);
@@ -81,9 +82,15 @@ export default apiInitializer((api) => {
           return `${Category.slugFor(category)}/${category.id}`;
         }
 
-        // 和侧边栏分类链接一样：这个分类的各种列表页都算「在这个页面」
+        // 这个分类和它的子分类（比如评分对象）的列表页都算「在这个页面」（Issue #22）。
+        // currentWhen 给布尔值时侧边栏直接用它决定高亮；discovery.category 跟着路由变，不在列表页时是空的
         get currentWhen() {
-          return "discovery.category discovery.latestCategory discovery.hotCategory discovery.topCategory discovery.newCategory discovery.unreadCategory";
+          const current = discovery.category;
+          return (
+            !!current &&
+            (current.id === category.id ||
+              current.parent_category_id === category.id)
+          );
         }
 
         get title() {
