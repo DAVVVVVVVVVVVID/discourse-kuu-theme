@@ -3,17 +3,24 @@
 // - 挂在 core bread-crumbs.gjs 的 bread-crumbs-right 挂载点（渲染成 <li>）
 // - 显示哪些分类由主题设置 quick_category_ids 决定，后台可以改
 // - 当前就在这个分类（或它的子分类，比如评分对象）时按钮显示为选中，再点一次回到「最新」
+// - 只在电脑上显示：手机上底栏（mobile-bottom-bar.gjs）已经有这两个入口（10-21 David 定）
 import Component from "@glimmer/component";
+import { service } from "@ember/service";
 import { trustHTML } from "@ember/template";
 import { apiInitializer } from "discourse/lib/api";
 import Category from "discourse/models/category";
 
 class KuuQuickCategories extends Component {
+  @service site;
+
   get current() {
     return this.args.outletArgs?.category;
   }
 
   get items() {
+    if (this.site.mobileView) {
+      return [];
+    }
     const current = this.current;
     return (settings.quick_category_ids || "")
       .split("|")
