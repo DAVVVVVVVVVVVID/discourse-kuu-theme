@@ -4,7 +4,7 @@
 
 ## 分工
 
-- **这个仓库**：主题组件的开发（CSS、前端 JS、主题设置）。在 WSL 的 `~/discourse-kuu-theme` 里开发，在这里开 Claude Code
+- **这个仓库**：主题组件的开发（CSS、前端 JS、主题设置）。在 WSL 的 `~/discourse/plugins/discourse-kuu-theme` 里开发（和插件放在一起；没有 `plugin.rb`，Discourse 不会把它当插件加载），在这里开 Claude Code
 - **KUU 运维项目**（David 的私有仓库 kuu-forum，另一个 Claude Code 会话）：写需求交接、审核 PR、上线、记改动记录。服务器、站点设置、插件部署都归那边
 - **插件**各有自己的仓库（discourse-kuu-market、-ratings、-kyoto-email、-new-topic、-rewards），需要插件配合的地方写进 PR，由 KUU 协调
 - 需求来源：Notion「京圈运营中心 › 开发计划」和这个仓库的 GitHub Issue
