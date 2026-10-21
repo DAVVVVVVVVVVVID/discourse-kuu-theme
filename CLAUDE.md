@@ -47,7 +47,9 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | 文件 | 内容 |
 |---|---|
 | `common/common.scss` | 评分帖书签、顶部分类筛选和快捷按钮样式、卡片预览一行、隐藏新话题小蓝点、手机上插件表单全屏、手机底栏、手机分类标签、手机瀑布流 |
-| `javascripts/discourse/api-initializers/quick-categories.gjs` | 「全部 ▾」右边的快捷分类按钮（只在电脑上） |
+| `javascripts/discourse/api-initializers/quick-categories.gjs` | 「全部 ▾」右边的快捷分类按钮（只在电脑上；图标 + 文字，图标和底栏一致） |
+| `javascripts/discourse/api-initializers/standalone-categories.gjs` | 二手市场、评分中心做成「独立页面」（设置 `standalone_category_ids`，子分类也算）：侧边栏「类别」里藏掉（按设置生成 CSS，按链接网址藏）、「全部 ▾」下拉里去掉（select-kit `replaceContent`）、侧边栏「话题」正下方加入口（`addCommunitySectionLink` + CSS `order`）；进去以后顶部只显示「‹ 首页」+ 标题（`after-breadcrumbs`，body 加 `kuu-standalone-page`），电脑保留发帖按钮 |
+| `javascripts/discourse/lib/kuu-standalone.js` | 哪些分类是独立页面、它们的图标（底栏左右两个分类用底栏的图标） |
 | `javascripts/discourse/api-initializers/mobile-bottom-bar.gjs` | 手机底栏：首页、二手、中间「+」发帖、评分、我的；代替 FKB Pro 列表页的悬浮按钮 |
 | `javascripts/discourse/api-initializers/mobile-category-tabs.gjs` | 手机顶部分类标签（代替「全部 ▾」下拉框），挂 `after-breadcrumbs` |
 | `javascripts/discourse/api-initializers/mobile-waterfall.gjs` | 手机两列瀑布流，挂 `before-topic-list`；同一个列表的 core 表格加 `.kuu-waterfall-source` 类名后由 CSS 藏起来 |
@@ -62,7 +64,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/lib/kuu-share-image.js` | 分享图的 canvas 画法（1080×1440，三种样式，照 David 确认的参考图 `D:\PROJECT\KUU\brand\share\`）、中文换行 |
 | `javascripts/discourse/lib/kuu-share-data.js` | 分享图的数据：帖子、二手 `kuu_market_listing`、评分 `/kuu-ratings/boards/:id/items?sort=score`；图片都 fetch 成 blob 再画 |
 | `javascripts/discourse/lib/vendor/qrcode-generator.js` | 第三方二维码库（MIT），原样拷贝，eslint / prettier 跳过 |
-| `settings.yml` | `quick_category_ids`、`bottom_bar_*`、`category_tabs_hidden_ids`、`waterfall_excluded_category_ids`、`text_cover_*`、`post_share_icon`、`post_reply_icon`、`share_image_*` |
+| `settings.yml` | `standalone_category_ids`、`quick_category_ids`、`bottom_bar_*`、`category_tabs_hidden_ids`、`waterfall_excluded_category_ids`、`text_cover_*`、`post_share_icon`、`post_reply_icon`、`share_image_*` |
 | `about.json` | modifier `topic_thumbnail_sizes: [[600, 1200]]`：列表数据里才有图片宽高和小缩略图（瀑布流按原图比例要用）；`serialize_topic_excerpts`：列表里带摘要（FKB Pro 也开了，这里再开一次，不依赖它） |
 
 和插件的配合：
@@ -80,6 +82,8 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - FKB Pro 手机端：列表页的悬浮按钮是 `.list-controls .navigation-container .navigation-controls`（新建话题、铃铛）和 `#navigation-bar`（最新 / 新 / 热门），现在被底栏 CSS 隐藏
 - 加到桌面（PWA）后 core 会显示自己的「返回 / 前进」底栏（`html.footer-nav-visible`、`--footer-nav-height`），手机底栏要放在它上面
 - 替换 CSS 时注意文件里可能有**几处一模一样的写法**，改之前确认改的是哪一处
+- FKB Pro 手机版给「全部 ▾」下拉写了 `display: flex !important`，选择器优先级是 (0,6,1)。要藏它，选择器路径里写全 `.list-controls .container .navigation-container`，再重复写一次类名
+- core 的「新建话题」按钮 `#create-topic` 外面包着一层组合按钮 `d-combo-button`，藏 `.navigation-controls` 里其他按钮时要留下包着它的那一层（`:has(#create-topic)`）
 - **WSL 里没有 Linux 版 node / pnpm**，检查在开发容器里跑：`docker exec -u discourse discourse_dev bash -lc 'cd /src/plugins/discourse-kuu-theme && pnpm install && pnpm lint'`
 - 本地把组件更新到开发环境（本地组件 ID 2）：`d/rails runner 'RemoteTheme.import_theme_from_directory("/src/plugins/discourse-kuu-theme", theme_id: 2)'`（会跳过 node_modules）。**本地分类 ID 和线上不一样**（本地二手 7、评分 5），本地的主题设置要改成本地 ID。改了 CSS 后如果页面还是旧样式，重启 `d/dev`
 - `d/dev` 要 TTY，后台跑用 `docker exec -u discourse:discourse -w /src discourse_dev bin/dev`

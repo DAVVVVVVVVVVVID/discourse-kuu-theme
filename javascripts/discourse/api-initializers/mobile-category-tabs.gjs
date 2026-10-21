@@ -14,6 +14,7 @@ import { service } from "@ember/service";
 import { apiInitializer } from "discourse/lib/api";
 import dIcon from "discourse/ui-kit/helpers/d-icon";
 import dScrollIntoView from "discourse/ui-kit/modifiers/d-scroll-into-view";
+import { isStandaloneCategory } from "../lib/kuu-standalone.js";
 import { hiddenTabCategoryIds } from "../lib/kuu-waterfall.js";
 
 const SCROLL_OPTIONS = {
@@ -28,8 +29,14 @@ class KuuCategoryTabs extends Component {
   @tracked expanded = false;
 
   get show() {
-    const { tag, additionalTags } = this.args.outletArgs;
-    return this.site.mobileView && !tag && !additionalTags?.length;
+    const { tag, additionalTags, category } = this.args.outletArgs;
+    // 二手 / 评分这些独立页面上顶部换成「‹ 首页」+ 标题（standalone-categories.gjs）
+    return (
+      this.site.mobileView &&
+      !tag &&
+      !additionalTags?.length &&
+      !isStandaloneCategory(category)
+    );
   }
 
   get current() {

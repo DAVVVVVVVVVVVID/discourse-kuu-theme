@@ -1,3 +1,8 @@
+standalone_category_ids:
+  type: list
+  list_type: category
+  default: "8|9"
+  description: "做成「独立页面」的分类（默认二手市场 8、评分中心 9，子分类也算）：侧边栏「类别」和「全部 ▾」下拉里不显示，改成侧边栏「话题」下面的入口；进去以后顶部只显示「‹ 首页」和标题"
 quick_category_ids:
   type: list
   list_type: category
@@ -41,8 +46,8 @@ bottom_bar_center_icon:
 category_tabs_hidden_ids:
   type: list
   list_type: category
-  default: "3"
-  description: "手机顶部分类标签里不显示的分类（默认 3 = 管理人员）。子分类和未分类本来就不显示"
+  default: "3|8|9"
+  description: "手机顶部分类标签里不显示的分类（默认 3 = 管理人员、8 = 二手市场、9 = 评分中心；二手、评分在底栏里有）。子分类和未分类本来就不显示"
 waterfall_excluded_category_ids:
   type: list
   list_type: category
