@@ -4,11 +4,13 @@
 // - 显示哪些分类由主题设置 quick_category_ids 决定，后台可以改
 // - 当前就在这个分类（或它的子分类，比如评分对象）时按钮显示为选中，再点一次回到「最新」
 // - 只在电脑上显示：手机上底栏（mobile-bottom-bar.gjs）已经有这两个入口（10-21 David 定）
+// - 图标 + 文字，不要椭圆边框（10-22，Issue #20）；图标和手机底栏一致（lib/kuu-standalone.js 的 standaloneIcon）
 import Component from "@glimmer/component";
 import { service } from "@ember/service";
-import { trustHTML } from "@ember/template";
 import { apiInitializer } from "discourse/lib/api";
 import Category from "discourse/models/category";
+import dIcon from "discourse/ui-kit/helpers/d-icon";
+import { standaloneIcon } from "../lib/kuu-standalone.js";
 
 class KuuQuickCategories extends Component {
   @service site;
@@ -36,7 +38,7 @@ class KuuQuickCategories extends Component {
           name: category.name,
           active,
           url: active ? "/latest" : category.url,
-          style: trustHTML(`--kuu-quick-cat-color: #${category.color}`),
+          icon: standaloneIcon(category.id),
         };
       });
   }
@@ -49,8 +51,10 @@ class KuuQuickCategories extends Component {
             class="kuu-quick-cat {{if item.active '--active'}}"
             data-category-id={{item.id}}
             href={{item.url}}
-            style={{item.style}}
-          >{{item.name}}</a>
+          >
+            {{dIcon item.icon}}
+            <span>{{item.name}}</span>
+          </a>
         {{/each}}
       </div>
     {{/if}}

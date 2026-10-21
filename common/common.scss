@@ -121,49 +121,46 @@ $kuu-cream: #fcf9f2; // 米白：Logo 底色
 }
 
 // 下拉框右边的快捷分类按钮（2026-10-21，配合 javascripts/.../quick-categories.gjs）
-// 小胶囊：左边一个小方块是分类自己的颜色；当前就在这个分类时用藏青实心表示选中
+// 10-22（Issue #20）改成「图标 + 文字」，不要椭圆边框和色块；字号比「全部 ▾」小一档，
+// 图标和手机底栏一致。当前就在这个分类时藏青加粗
 .category-breadcrumb .kuu-quick-cats {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4em;
+  gap: 1.1em;
   align-items: center;
+  margin-left: 0.6em;
 }
 
 .kuu-quick-cat {
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
-  padding: 0.25em 0.8em;
-  border: 1px solid var(--primary-low);
-  border-radius: 999px;
-  background: var(--secondary);
+  gap: 0.35em;
+  padding: 0.2em 0;
   color: var(--primary-high);
-  font-size: var(--font-down-1);
+  font-size: var(--font-0);
   font-weight: 600;
   line-height: 1.4;
   white-space: nowrap;
 
-  &::before {
-    content: "";
-    width: 0.6em;
-    height: 0.6em;
-    border-radius: 2px;
-    background: var(--kuu-quick-cat-color);
+  .d-icon {
+    color: var(--primary-medium);
   }
 
   &:hover,
   &:focus {
-    border-color: var(--kuu-quick-cat-color);
-    color: var(--primary);
+    color: $kuu-navy;
+
+    .d-icon {
+      color: $kuu-navy;
+    }
   }
 
   &.--active {
-    border-color: $kuu-navy;
-    background: $kuu-navy;
-    color: $kuu-cream;
+    color: $kuu-navy;
+    font-weight: 700;
 
-    &::before {
-      background: $kuu-cream;
+    .d-icon {
+      color: $kuu-navy;
     }
   }
 }
@@ -700,4 +697,88 @@ html.mobile-view {
 // 用 id 选：我们的按钮为了快捷键也带 share-and-invite 类名
 #topic-footer-button-share-and-invite {
   display: none;
+}
+
+// ------------------------------------------------------------
+// 二手市场、评分中心做成「独立页面」（2026-10-22，Issue #20，配合 javascripts/.../standalone-categories.gjs）
+// - 侧边栏「话题」下面的入口：插件 API 加的链接默认排在 core 链接后面，这里用 order 挪到「话题」正下方
+//   （「话题」的 data-list-item-name 是 everything）。侧边栏「类别」里藏掉它们的 CSS 由 JS 按设置生成
+// - 进入这些分类的列表页后（body.kuu-standalone-page），顶部这一行只留「‹ 首页」+ 标题和发帖按钮：
+//   「全部 ▾」下拉（连同快捷按钮）、「最新 / 热门」、分类的铃铛等其他按钮都藏起来。
+//   FKB Pro 手机版给下拉框写了 display: flex !important（优先级 0,6,1），这里的选择器要比它具体
+//   （路径里写上 .container，再重复写一次类名，0,6,2）
+// ------------------------------------------------------------
+.sidebar-section[data-section-name="community"] .sidebar-section-content {
+  display: flex;
+  flex-direction: column;
+
+  > li {
+    order: 2;
+  }
+
+  > li[data-list-item-name="everything"] {
+    order: 0;
+  }
+
+  > li[data-list-item-name^="kuu-standalone-"] {
+    order: 1;
+  }
+}
+
+html
+  body.kuu-standalone-page
+  .list-controls
+  .container
+  .navigation-container
+  .category-breadcrumb.category-breadcrumb {
+  display: none !important;
+}
+
+body.kuu-standalone-page .list-controls .navigation-container {
+  #navigation-bar {
+    display: none !important;
+  }
+
+  // 发帖按钮外面包着一层组合按钮（d-combo-button），包着它的那一层也要留
+  .navigation-controls > *:not(#create-topic, :has(#create-topic)) {
+    display: none !important;
+  }
+}
+
+.kuu-standalone-header {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 1em;
+  align-items: center;
+  min-width: 0;
+}
+
+.kuu-standalone-header__back {
+  display: inline-flex;
+  flex: none;
+  gap: 0.2em;
+  align-items: center;
+  color: var(--primary-medium);
+  font-size: var(--font-0);
+
+  .d-icon {
+    width: 0.8em;
+    height: 0.8em;
+  }
+
+  &:hover,
+  &:focus {
+    color: $kuu-navy;
+  }
+}
+
+.kuu-standalone-header__title {
+  margin: 0;
+  overflow: hidden;
+  color: var(--primary);
+  font-size: var(--font-up-2);
+  font-weight: 700;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
