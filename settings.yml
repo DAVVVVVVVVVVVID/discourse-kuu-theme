@@ -3,6 +3,24 @@ quick_category_ids:
   list_type: category
   default: "8|9"
   description: "帖子列表上方「全部」下拉框右边的快捷分类按钮（默认：二手市场 8、评分中心 9）。按这里的顺序显示"
+bottom_bar_home_label:
+  default: "首页"
+  description: "手机底栏最左边（全部话题）的文字"
+bottom_bar_home_icon:
+  default: "house"
+  description: "手机底栏最左边的图标"
+bottom_bar_left_label:
+  default: "二手"
+  description: "手机底栏左边分类按钮的文字"
+bottom_bar_right_label:
+  default: "评分"
+  description: "手机底栏右边分类按钮的文字"
+bottom_bar_me_label:
+  default: "我的"
+  description: "手机底栏最右边（我的个人主页）的文字"
+bottom_bar_me_icon:
+  default: "user"
+  description: "手机底栏最右边的图标"
 bottom_bar_left_category:
   type: integer
   default: 8

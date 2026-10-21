@@ -215,7 +215,7 @@ html.mobile-view {
 
 // ------------------------------------------------------------
 // 手机底栏（2026-10-21，配合 javascripts/.../mobile-bottom-bar.gjs）
-// 左二手市场、中间突出的圆形「+」、右评分中心。只在手机上渲染（JS 里判断 site.mobileView）
+// 首页、二手、中间突出的圆形「+」、评分、我的（10-21 加了首页和我的）。只在手机上渲染（JS 里判断 site.mobileView）
 // - iPhone 底部留出安全区（env(safe-area-inset-bottom)）
 // - 加到桌面后 core 会显示自己的「返回 / 前进」底栏（html.footer-nav-visible），我们的放在它上面
 // - 写帖子（编辑器展开）和全屏聊天时藏起来
@@ -233,7 +233,7 @@ html.mobile-view {
   left: 0;
   z-index: z("footer-nav");
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr 1fr auto 1fr 1fr;
   align-items: center;
   height: calc(var(--kuu-bottom-bar-height) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);

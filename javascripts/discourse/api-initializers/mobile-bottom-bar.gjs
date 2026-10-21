@@ -1,21 +1,38 @@
 // 手机底栏（2026-10-21）
-// 左：二手市场，中：突出的圆形「+」发帖，右：评分中心。只在手机上显示，所有页面都有；
+// 首页 | 二手 | 突出的圆形「+」 | 评分 | 我的。只在手机上显示，所有页面都有；
 // 写帖子（编辑器打开）时由 CSS 藏起来。原来 FKB Pro 在列表页的悬浮按钮（新建话题、铃铛、
 // 「最新 / 新 / 热门」切换）由 CSS 隐藏，换成这个底栏。
 // - 挂在 core application 模板的 below-footer 挂载点：所有页面都会渲染；底栏本身 position: fixed
+// - 首页：/latest，在不分分类、不分标签的列表页（最新、热门……）时高亮
+// - 二手 / 评分：主题设置里的分类（bottom_bar_left_category / bottom_bar_right_category），
+//   当前在这个分类（或子分类）或它的帖子里时高亮
 // - 「+」：未登录跳到登录页；登录后调用 discourse-kuu-new-topic 插件的 openNewTopic()，
 //   和点 core「新建话题」一样（专属分类直接开表单，其他地方弹选择框）。插件没有这个方法时退回普通编辑器
-// - 两边的分类和图标由主题设置决定：bottom_bar_left_category / _icon、bottom_bar_right_category / _icon
-// - 当前在这个分类（或它的子分类）时按钮高亮
+// - 我的：自己的个人主页「总结」页；未登录跳到登录页；在自己的个人页、偏好设置里时高亮
+// - 文字和图标都是主题设置（bottom_bar_*_label、bottom_bar_*_icon）
 import Component from "@glimmer/component";
 import { on } from "@ember/modifier";
 import { action } from "@ember/object";
 import { getOwner } from "@ember/owner";
 import { service } from "@ember/service";
 import { apiInitializer } from "discourse/lib/api";
-import DiscourseURL from "discourse/lib/url";
+import DiscourseURL, { userPath } from "discourse/lib/url";
 import Category from "discourse/models/category";
 import dIcon from "discourse/ui-kit/helpers/d-icon";
+
+const KuuBottomBarItem = <template>
+  {{#if @item}}
+    <a
+      href={{@item.url}}
+      class="kuu-bottom-bar__item {{if @item.active '--active'}}"
+    >
+      {{dIcon @item.icon}}
+      <span class="kuu-bottom-bar__label">{{@item.label}}</span>
+    </a>
+  {{else}}
+    <span></span>
+  {{/if}}
+</template>;
 
 class KuuMobileBottomBar extends Component {
   @service site;
@@ -34,7 +51,7 @@ class KuuMobileBottomBar extends Component {
     return categoryId ? Category.findById(categoryId) : null;
   }
 
-  item(categoryId, icon) {
+  categoryItem(categoryId, icon, label) {
     const category = Category.findById(parseInt(categoryId, 10));
     if (!category) {
       return null;
@@ -44,21 +61,53 @@ class KuuMobileBottomBar extends Component {
       !!current &&
       (current.id === category.id ||
         current.parent_category_id === category.id);
-    return { name: category.name, url: category.url, icon, active };
+    return { label, url: category.url, icon, active };
+  }
+
+  get home() {
+    const routeName = this.router.currentRouteName || "";
+    const active =
+      routeName.startsWith("discovery.") &&
+      !this.discovery?.category &&
+      !this.discovery?.tag;
+    return {
+      label: settings.bottom_bar_home_label,
+      icon: settings.bottom_bar_home_icon,
+      url: "/latest",
+      active,
+    };
   }
 
   get left() {
-    return this.item(
+    return this.categoryItem(
       settings.bottom_bar_left_category,
-      settings.bottom_bar_left_icon
+      settings.bottom_bar_left_icon,
+      settings.bottom_bar_left_label
     );
   }
 
   get right() {
-    return this.item(
+    return this.categoryItem(
       settings.bottom_bar_right_category,
-      settings.bottom_bar_right_icon
+      settings.bottom_bar_right_icon,
+      settings.bottom_bar_right_label
     );
+  }
+
+  get me() {
+    const username = this.currentUser?.username;
+    const viewing = this.router.currentRoute?.find?.(
+      (route) => route.name === "user"
+    )?.params?.username;
+    return {
+      label: settings.bottom_bar_me_label,
+      icon: settings.bottom_bar_me_icon,
+      url: username ? userPath(`${username}/summary`) : "/login",
+      active:
+        !!username &&
+        !!viewing &&
+        viewing.toLowerCase() === username.toLowerCase(),
+    };
   }
 
   get centerIcon() {
@@ -87,17 +136,8 @@ class KuuMobileBottomBar extends Component {
   <template>
     {{#if this.site.mobileView}}
       <nav class="kuu-bottom-bar" aria-label="快捷导航">
-        {{#if this.left}}
-          <a
-            href={{this.left.url}}
-            class="kuu-bottom-bar__item {{if this.left.active '--active'}}"
-          >
-            {{dIcon this.left.icon}}
-            <span class="kuu-bottom-bar__label">{{this.left.name}}</span>
-          </a>
-        {{else}}
-          <span></span>
-        {{/if}}
+        <KuuBottomBarItem @item={{this.home}} />
+        <KuuBottomBarItem @item={{this.left}} />
 
         <button
           type="button"
@@ -108,17 +148,8 @@ class KuuMobileBottomBar extends Component {
           {{dIcon this.centerIcon}}
         </button>
 
-        {{#if this.right}}
-          <a
-            href={{this.right.url}}
-            class="kuu-bottom-bar__item {{if this.right.active '--active'}}"
-          >
-            {{dIcon this.right.icon}}
-            <span class="kuu-bottom-bar__label">{{this.right.name}}</span>
-          </a>
-        {{else}}
-          <span></span>
-        {{/if}}
+        <KuuBottomBarItem @item={{this.right}} />
+        <KuuBottomBarItem @item={{this.me}} />
       </nav>
     {{/if}}
   </template>
