@@ -5,5 +5,9 @@
   "license_url": null,
   "authors": "京圈开发组",
   "minimum_discourse_version": null,
-  "maximum_discourse_version": null
+  "maximum_discourse_version": null,
+  "modifiers": {
+    "serialize_topic_excerpts": true,
+    "topic_thumbnail_sizes": [[600, 1200]]
+  }
 }

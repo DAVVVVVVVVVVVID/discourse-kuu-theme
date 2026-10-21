@@ -38,3 +38,20 @@ bottom_bar_right_icon:
 bottom_bar_center_icon:
   default: "plus"
   description: "手机底栏中间发帖按钮的图标"
+category_tabs_hidden_ids:
+  type: list
+  list_type: category
+  default: "3"
+  description: "手机顶部分类标签里不显示的分类（默认 3 = 管理人员）。子分类和未分类本来就不显示"
+waterfall_excluded_category_ids:
+  type: list
+  list_type: category
+  default: "8|9"
+  description: "手机上不用瀑布流、保留插件卡片的分类（默认二手市场 8、评分中心 9；它们的子分类也一样）"
+text_cover_image:
+  type: upload
+  default: ""
+  description: "瀑布流里没有图片的帖子用的「文字封面」背景图（建议 3:4 竖图）。不传时用品牌色纯色背景"
+text_cover_text_color:
+  default: "#0A2D56"
+  description: "文字封面上标题的颜色（用了上面的背景图时生效）"

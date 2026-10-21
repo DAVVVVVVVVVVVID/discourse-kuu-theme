@@ -46,14 +46,20 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 
 | 文件 | 内容 |
 |---|---|
-| `common/common.scss` | 评分帖书签、顶部分类筛选和快捷按钮样式、卡片预览一行、隐藏新话题小蓝点、手机上插件表单全屏、手机底栏 |
+| `common/common.scss` | 评分帖书签、顶部分类筛选和快捷按钮样式、卡片预览一行、隐藏新话题小蓝点、手机上插件表单全屏、手机底栏、手机分类标签、手机瀑布流 |
 | `javascripts/discourse/api-initializers/quick-categories.gjs` | 「全部 ▾」右边的快捷分类按钮（只在电脑上） |
 | `javascripts/discourse/api-initializers/mobile-bottom-bar.gjs` | 手机底栏：首页、二手、中间「+」发帖、评分、我的；代替 FKB Pro 列表页的悬浮按钮 |
-| `settings.yml` | `quick_category_ids`、`bottom_bar_*` |
+| `javascripts/discourse/api-initializers/mobile-category-tabs.gjs` | 手机顶部分类标签（代替「全部 ▾」下拉框），挂 `after-breadcrumbs` |
+| `javascripts/discourse/api-initializers/mobile-waterfall.gjs` | 手机两列瀑布流，挂 `before-topic-list`；同一个列表的 core 表格加 `.kuu-waterfall-source` 类名后由 CSS 藏起来 |
+| `javascripts/discourse/components/kuu-waterfall-card.gjs` | 瀑布流卡片（封面、标题、作者、第一楼的赞；文字封面的卡片下面是正文开头 `excerpt` 而不是标题；二手价格状态；评分 / 置顶角标） |
+| `javascripts/discourse/lib/kuu-waterfall.js` | 哪些列表用瀑布流、封面选择（文字封面模板以后在 `textCoverFor` 里扩展）、分列高度估算 |
+| `settings.yml` | `quick_category_ids`、`bottom_bar_*`、`category_tabs_hidden_ids`、`waterfall_excluded_category_ids`、`text_cover_*` |
+| `about.json` | modifier `topic_thumbnail_sizes: [[600, 1200]]`：列表数据里才有图片宽高和小缩略图（瀑布流按原图比例要用）；`serialize_topic_excerpts`：列表里带摘要（FKB Pro 也开了，这里再开一次，不依赖它） |
 
 和插件的配合：
 - 底栏的「+」调用 `discourse-kuu-new-topic` 插件的 `service:kuu-new-topic` 的 `openNewTopic({ category, tag })`，没有时退回 `composer.openNewTopic`
 - 二手帖在列表里的商品卡片由 `discourse-kuu-market` 插件画；评分主题的卡片由 `discourse-kuu-ratings` 插件画（开发中）
+- 手机瀑布流在混合列表里读插件放进列表的字段：二手 `kuu_market_card`（`item_name`、`price`、`free`、`has_photos`）和 `kuu_market_status`，评分 `kuu_rating_board_card.items[0].image_url`（没有时用评分插件的 `kuu_ratings_placeholder_image`）；状态文字用二手插件的 `kuu_market.card_statuses.*`。插件改了这些字段要同步改 `lib/kuu-waterfall.js` 和 `kuu-waterfall-card.gjs`
 - 注册等待页的激活码、倒计时由 `discourse-kuu-kyoto-email` 插件负责，这里不管
 
 ## 踩过的坑
@@ -65,4 +71,9 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - FKB Pro 手机端：列表页的悬浮按钮是 `.list-controls .navigation-container .navigation-controls`（新建话题、铃铛）和 `#navigation-bar`（最新 / 新 / 热门），现在被底栏 CSS 隐藏
 - 加到桌面（PWA）后 core 会显示自己的「返回 / 前进」底栏（`html.footer-nav-visible`、`--footer-nav-height`），手机底栏要放在它上面
 - 替换 CSS 时注意文件里可能有**几处一模一样的写法**，改之前确认改的是哪一处
+- **WSL 里没有 Linux 版 node / pnpm**，检查在开发容器里跑：`docker exec -u discourse discourse_dev bash -lc 'cd /src/plugins/discourse-kuu-theme && pnpm install && pnpm lint'`
+- 本地把组件更新到开发环境（本地组件 ID 2）：`d/rails runner 'RemoteTheme.import_theme_from_directory("/src/plugins/discourse-kuu-theme", theme_id: 2)'`（会跳过 node_modules）。**本地分类 ID 和线上不一样**（本地二手 7、评分 5），本地的主题设置要改成本地 ID。改了 CSS 后如果页面还是旧样式，重启 `d/dev`
+- `d/dev` 要 TTY，后台跑用 `docker exec -u discourse:discourse -w /src discourse_dev bin/dev`
+- Playwright 截图不能 `waitUntil: "networkidle"`（Discourse 的长轮询一直不停），等页面元素出现（比如 `.kuu-waterfall`）
+- WSL 内存小（约 5GB），开发服务器、Playwright、别的会话跑的 rspec 同时跑会把容器拖垮（`can't alloc thread`），截图脚本崩了要清掉残留的 chrome 进程
 - 站点的 CSP 没有限制 `frame-src`；B 站嵌入播放器在手机上显示「视频失效」（2026-10-20 试过 5 种写法都不行），别再走这条路
