@@ -241,8 +241,8 @@ async function marketData(topic, listing, siteSettings) {
     nameTokens,
     price: marketPrice(listing),
     status: {
+      key: listing.status,
       label: i18n(`kuu_market.card_statuses.${listing.status}`),
-      active: ["selling", "buying"].includes(listing.status),
     },
     location: [listing.location && `交易地点：${listing.location}`, tradeMethod]
       .filter(Boolean)
