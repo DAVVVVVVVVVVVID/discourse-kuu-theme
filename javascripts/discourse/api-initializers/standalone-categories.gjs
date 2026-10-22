@@ -108,5 +108,43 @@ export default apiInitializer((api) => {
     });
   }
 
+  // 「鲸币商城」（Issue #35）：积分插件 discourse-kuu-points 的 /kuu-shop，排在二手市场、评分中心后面，
+  // 在这个文件里加才能保证顺序。只在插件装上并打开时显示（没装时 kuu_points_enabled 不存在，按关着处理）。
+  // 插件没装时前端路由 kuu-shop 不存在，所以用网址，不用路由名
+  const siteSettings = api.container.lookup("service:site-settings");
+  const router = api.container.lookup("service:router");
+  api.addCommunitySectionLink((BaseCommunitySectionLink) => {
+    return class extends BaseCommunitySectionLink {
+      get name() {
+        return "kuu-points-shop";
+      }
+
+      get shouldDisplay() {
+        return siteSettings.kuu_points_enabled === true;
+      }
+
+      get href() {
+        return "/kuu-shop";
+      }
+
+      // 按网址判断，不依赖插件的路由名
+      get currentWhen() {
+        return /^\/kuu-shop(\/|\?|$)/.test(router.currentURL || "");
+      }
+
+      get title() {
+        return settings.sidebar_shop_label;
+      }
+
+      get text() {
+        return settings.sidebar_shop_label;
+      }
+
+      get prefixValue() {
+        return settings.sidebar_shop_icon;
+      }
+    };
+  });
+
   api.renderInOutlet("after-breadcrumbs", KuuStandaloneHeader);
 });
