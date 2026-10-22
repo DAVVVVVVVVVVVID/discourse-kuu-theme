@@ -58,6 +58,10 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/api-initializers/post-share-menu.gjs` | 帖子菜单：每一楼的「复制链接」按钮换成分享下拉菜单、回复按钮换图标（`post-menu-buttons` transformer） |
 | `javascripts/discourse/api-initializers/user-menu-profile-tab.gjs` | 点头像默认打开「个人资料」栏：core 写死默认是通知，在 `user-menu-tabs-list__after` 放一个空组件，渲染结束时点一下个人资料栏 |
 | `javascripts/discourse/api-initializers/chat-unread-banner.gjs` | 有未读私聊（直接对话频道）时页面顶部的提醒横条：去看看 / 忽略全部（标为已读）/ ×（只关这一次）。挂 `above-main-container`，数据来自 chat 插件的 `chatChannelsManager` |
+| `javascripts/discourse/api-initializers/chat-share-location.js` | 聊天输入框「+」菜单里的「位置」（`registerChatComposerButton`），私聊和公共频道都有 |
+| `javascripts/discourse/components/kuu-share-location-modal.gjs` | 分享位置窗口：当前位置 / 搜索地点 → 预览（小地图、谁会看到）→ 确认后用 `api.sendChatMessage` 发「📍 地点名 + Google 地图链接」 |
+| `javascripts/discourse/lib/kuu-location.js` | 浏览器定位、Nominatim 地点搜索（只在点「搜索」时请求、至少隔 1 秒、限日本优先京都）、OpenStreetMap 预览图块 |
+| `locales/*.yml` | 主题自己的翻译（用 `themePrefix("key")`）。chat「+」菜单的按钮只认翻译 key，所以「位置」写在这里 |
 | `javascripts/discourse/api-initializers/open-topic-from-top.js` | 从列表点进帖子一律从第一楼开始：`registerCustomLastUnreadUrlCallback` 让 `lastUnreadUrl` 返回不带楼号的链接（core 和插件的列表链接都用它）。通知等指向某一楼的链接不受影响 |
 | `javascripts/discourse/api-initializers/topic-footer-share.js` | 话题最底部的「分享」换成分享菜单（所有话题）：core 的 `share-and-invite` 由 CSS 藏起来，注册同优先级的新按钮，点击用 `menu` 服务弹出菜单。core 分享窗口里的「邀请」随之去掉 |
 | `javascripts/discourse/components/kuu-share-menu.gjs` | 帖子菜单里的分享按钮（DMenu） |
@@ -96,4 +100,5 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - 分享图二维码的检查：`~/discourse/tmp/discourse-kuu-theme/` 里的 qr-check.mjs 用 jsQR 在浏览器里识别（验收标准：整张图缩到 540px 宽、再压成质量 50 的 JPEG 能识别，Issue #16），但**微信实机扫码只能 David 测**
 - WSL 内存小（约 5GB），开发服务器、Playwright、别的会话跑的 rspec 同时跑会把容器拖垮（`can't alloc thread`）。截图脚本、测试脚本放在 `~/discourse/tmp/discourse-kuu-theme/`（容器里 `/src/tmp/discourse-kuu-theme/`），跑之前看 `free -m`，用 `flock` 排队；脚本崩了只清理自己启动的 chrome 进程
 - 开发库是共用的：为测试改了站点设置、用户设置，测完改回来，在回复里写明
+- 站点的 CSP 只限制了 `script-src` 等几项，**没有限制 `connect-src`、`img-src`**：分享位置要请求 `nominatim.openstreetmap.org`、显示 `tile.openstreetmap.org` 的图块。以后后台改 CSP 要把这两个放进白名单
 - 站点的 CSP 没有限制 `frame-src`；B 站嵌入播放器在手机上显示「视频失效」（2026-10-20 试过 5 种写法都不行），别再走这条路
