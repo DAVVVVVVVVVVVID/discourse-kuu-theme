@@ -68,6 +68,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/components/kuu-share-menu.gjs` | 帖子菜单里的分享按钮（DMenu） |
 | `javascripts/discourse/components/kuu-share-menu-content.gjs` | 分享菜单的内容：复制链接、保存分享图（只在公开帖子）。帖子菜单和话题底部共用 |
 | `javascripts/discourse/components/kuu-share-image-modal.gjs` | 「保存分享图」弹窗：生成、显示（data URL，微信里能长按）、电脑上「复制图片」（剪贴板 PNG）、Web Share。原来的「下载图片」（`<a download href="data:…">`）会被 core 的全局链接拦截吞掉，已去掉 |
+| `javascripts/discourse/lib/kuu-share-reward.js` | 分享成功后报告 `discourse-kuu-points` 的「转发」每日任务（`POST /kuu-points/tasks/share.json`），奖励时提示经验和鲸币；404 / 网络错误一律忽略。复制链接、复制分享图、分享到…成功时调，手机上分享图生成出来就算 |
 | `javascripts/discourse/lib/kuu-share-image.js` | 分享图的 canvas 画法（1080×1440，三种样式，照 David 确认的参考图 `D:\PROJECT\KUU\brand\share\`）、中文换行 |
 | `javascripts/discourse/lib/kuu-share-data.js` | 分享图的数据：帖子、二手 `kuu_market_listing`、评分 `/kuu-ratings/boards/:id/items?sort=score`；图片都 fetch 成 blob 再画 |
 | `javascripts/discourse/lib/vendor/qrcode-generator.js` | 第三方二维码库（MIT），原样拷贝，eslint / prettier 跳过 |
@@ -96,6 +97,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - （只在开发服务器没在跑时才启动）`d/dev` 要 TTY，后台跑用 `docker exec -u discourse:discourse -w /src discourse_dev bin/dev`
 - Playwright 截图不能 `waitUntil: "networkidle"`（Discourse 的长轮询一直不停），等页面元素出现（比如 `.kuu-waterfall`）
 - 本地用别的身份测（普通用户、管理员）：启动 `bin/dev` 时加 `-e DISCOURSE_DEV_ALLOW_ANON_TO_IMPERSONATE=1`，然后打开 `/session/用户名/become`
+- **改站点设置，开发服务器的工作进程同样收不到**（比如打开 `kuu_points_enabled` 后接口还是 404）。不为这个重启共用服务器：测主题这边的反应时，在 Playwright 里用 `context.route` 按插件接口的格式模拟返回（`share-reward.mjs` 的 mock 模式）
 - 不要 `pkill -f` / `kill` 别的会话的进程（`pkill -f bin/dev` 还会把执行它的 shell 自己也匹配上）。前端构建进程 `rolldown.mjs` 被强行停掉后，下次启动会报「already running」
 - canvas 只能导出没被「污染」的图：画进分享图的图片都要先 `fetch` 成 blob（`kuu-share-data.js` 的 `loadImage`），外链图读不到就当没有图
 - 分享图二维码的检查：`~/discourse/tmp/discourse-kuu-theme/` 里的 qr-check.mjs 用 jsQR 在浏览器里识别（验收标准：整张图缩到 540px 宽、再压成质量 50 的 JPEG 能识别，Issue #16），但**微信实机扫码只能 David 测**
