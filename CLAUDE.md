@@ -57,6 +57,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/lib/kuu-waterfall.js` | 哪些列表用瀑布流、封面选择（文字封面模板以后在 `textCoverFor` 里扩展）、分列高度估算 |
 | `javascripts/discourse/api-initializers/post-share-menu.gjs` | 帖子菜单：每一楼的「复制链接」按钮换成分享下拉菜单、回复按钮换图标（`post-menu-buttons` transformer） |
 | `javascripts/discourse/api-initializers/user-menu-profile-tab.gjs` | 点头像默认打开「个人资料」栏：core 写死默认是通知，在 `user-menu-tabs-list__after` 放一个空组件，渲染结束时点一下个人资料栏 |
+| `javascripts/discourse/api-initializers/chat-unread-banner.gjs` | 有未读私聊（直接对话频道）时页面顶部的提醒横条：去看看 / 忽略全部（标为已读）/ ×（只关这一次）。挂 `above-main-container`，数据来自 chat 插件的 `chatChannelsManager` |
 | `javascripts/discourse/api-initializers/open-topic-from-top.js` | 从列表点进帖子一律从第一楼开始：`registerCustomLastUnreadUrlCallback` 让 `lastUnreadUrl` 返回不带楼号的链接（core 和插件的列表链接都用它）。通知等指向某一楼的链接不受影响 |
 | `javascripts/discourse/api-initializers/topic-footer-share.js` | 话题最底部的「分享」换成分享菜单（所有话题）：core 的 `share-and-invite` 由 CSS 藏起来，注册同优先级的新按钮，点击用 `menu` 服务弹出菜单。core 分享窗口里的「邀请」随之去掉 |
 | `javascripts/discourse/components/kuu-share-menu.gjs` | 帖子菜单里的分享按钮（DMenu） |
