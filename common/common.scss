@@ -988,3 +988,34 @@ html.mobile-view .kuu-chat-unread-banner {
   color: var(--primary-medium);
   font-size: var(--font-down-2);
 }
+
+// ------------------------------------------------------------
+// 电脑上帖子卡片的封面图完整显示（2026-10-22，Issue #31，配合 javascripts/.../desktop-card-cover.js）
+// FKB Pro（fkb-c-topic-list.scss）把 .topic-image 做成固定高度（设置 topic_image_height）、
+// 左右 -1em 贴到卡片边缘、按设置裁剪。这里改成：
+// - 放回卡片内容区，和标题、摘要左右对齐，圆角写固定值（--d-default-border-radius 在 FKB Pro 里是 1em）
+// - 高度按原图比例：JS 把每张卡片的宽高比写在 --kuu-cover-ratio（瘦长图最多到 3:4），
+//   图片框用 aspect-ratio 先占好位置，图片 object-fit: cover 填满。比例和原图一样时就是完整显示，
+//   被限到 3:4 的长图则截取中间一段
+// - 拿不到宽高的帖子（原图太大、列表里没有 thumbnails）退回按图片自己的高度显示，最高 680px
+// 选择器比 FKB Pro 的（0,4,0）具体：前面加 html.desktop-view，类名重复写一次
+// ------------------------------------------------------------
+html.desktop-view .topic-list .main-link .tli-middle-section {
+  .topic-image.topic-image {
+    width: 100%;
+    height: auto;
+    max-height: 680px;
+    margin: 0.25em 0 0;
+    border-radius: 8px;
+    aspect-ratio: var(--kuu-cover-ratio, auto);
+    background: var(--primary-very-low);
+  }
+
+  .topic-image__img.topic-image__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+}

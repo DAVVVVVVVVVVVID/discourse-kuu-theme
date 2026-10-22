@@ -62,6 +62,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/components/kuu-share-location-modal.gjs` | 分享位置窗口：当前位置 / 搜索地点 → 预览（小地图、谁会看到）→ 确认后用 `api.sendChatMessage` 发「📍 地点名 + Google 地图链接」 |
 | `javascripts/discourse/lib/kuu-location.js` | 浏览器定位、Nominatim 地点搜索（只在点「搜索」时请求、至少隔 1 秒、限日本优先京都）、OpenStreetMap 预览图块 |
 | `locales/*.yml` | 主题自己的翻译（用 `themePrefix("key")`）。chat「+」菜单的按钮只认翻译 key，所以「位置」写在这里 |
+| `javascripts/discourse/api-initializers/desktop-card-cover.js` | 电脑上 FKB Pro 卡片的封面图完整显示：`topic-list-item-style` 把原图宽高比写进 `--kuu-cover-ratio`（瘦长图最多 3:4），`topic-list-topics-from` 把 `image_url` 换成最宽的已生成缩略图；样式在 common.scss（放回内容区、圆角、aspect-ratio 占位） |
 | `javascripts/discourse/api-initializers/open-topic-from-top.js` | 从列表点进帖子一律从第一楼开始：`registerCustomLastUnreadUrlCallback` 让 `lastUnreadUrl` 返回不带楼号的链接（core 和插件的列表链接都用它）。通知等指向某一楼的链接不受影响 |
 | `javascripts/discourse/api-initializers/topic-footer-share.js` | 话题最底部的「分享」换成分享菜单（所有话题）：core 的 `share-and-invite` 由 CSS 藏起来，注册同优先级的新按钮，点击用 `menu` 服务弹出菜单。core 分享窗口里的「邀请」随之去掉 |
 | `javascripts/discourse/components/kuu-share-menu.gjs` | 帖子菜单里的分享按钮（DMenu） |
