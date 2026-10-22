@@ -62,7 +62,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/api-initializers/topic-footer-share.js` | 话题最底部的「分享」换成分享菜单（所有话题）：core 的 `share-and-invite` 由 CSS 藏起来，注册同优先级的新按钮，点击用 `menu` 服务弹出菜单。core 分享窗口里的「邀请」随之去掉 |
 | `javascripts/discourse/components/kuu-share-menu.gjs` | 帖子菜单里的分享按钮（DMenu） |
 | `javascripts/discourse/components/kuu-share-menu-content.gjs` | 分享菜单的内容：复制链接、保存分享图（只在公开帖子）。帖子菜单和话题底部共用 |
-| `javascripts/discourse/components/kuu-share-image-modal.gjs` | 「保存分享图」弹窗：生成、显示（data URL，微信里能长按）、电脑下载、Web Share |
+| `javascripts/discourse/components/kuu-share-image-modal.gjs` | 「保存分享图」弹窗：生成、显示（data URL，微信里能长按）、电脑上「复制图片」（剪贴板 PNG）、Web Share。原来的「下载图片」（`<a download href="data:…">`）会被 core 的全局链接拦截吞掉，已去掉 |
 | `javascripts/discourse/lib/kuu-share-image.js` | 分享图的 canvas 画法（1080×1440，三种样式，照 David 确认的参考图 `D:\PROJECT\KUU\brand\share\`）、中文换行 |
 | `javascripts/discourse/lib/kuu-share-data.js` | 分享图的数据：帖子、二手 `kuu_market_listing`、评分 `/kuu-ratings/boards/:id/items?sort=score`；图片都 fetch 成 blob 再画 |
 | `javascripts/discourse/lib/vendor/qrcode-generator.js` | 第三方二维码库（MIT），原样拷贝，eslint / prettier 跳过 |
