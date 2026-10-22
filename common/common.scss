@@ -840,3 +840,151 @@ body.kuu-standalone-page .list-controls .navigation-container {
 html.mobile-view .kuu-chat-unread-banner {
   margin: 0.5em 0;
 }
+
+// ------------------------------------------------------------
+// 聊天里「分享位置」的小窗口（2026-10-22，Issue #24 第 2 条，配合 kuu-share-location-modal.gjs）
+// 预览小地图是以地点为中心的 OpenStreetMap 图块（裁成 256×256），红点在正中间；
+// 搜索结果一行一个，点了进预览。圆角写固定值
+// ------------------------------------------------------------
+.kuu-share-location-modal {
+  .d-modal__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+  }
+}
+
+.kuu-share-location-modal__locate {
+  width: 100%;
+}
+
+.kuu-share-location-modal__search {
+  display: flex;
+  gap: 0.5em;
+
+  input {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+  }
+}
+
+.kuu-share-location-modal__loading,
+.kuu-share-location-modal__empty {
+  color: var(--primary-medium);
+}
+
+.kuu-share-location-modal__error {
+  margin: 0;
+  padding: 0.5em 0.75em;
+  border-radius: 6px;
+  background: var(--danger-low);
+  color: var(--danger);
+}
+
+.kuu-share-location-modal__results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kuu-share-location-modal__result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  width: 100%;
+  padding: 0.6em 0.25em;
+  border: none;
+  border-bottom: 1px solid var(--primary-low);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    background: var(--primary-very-low);
+  }
+}
+
+.kuu-share-location-modal__result-name,
+.kuu-share-location-modal__name {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.kuu-share-location-modal__result-address,
+.kuu-share-location-modal__address,
+.kuu-share-location-modal__coords {
+  color: var(--primary-medium);
+  font-size: var(--font-down-1);
+}
+
+.kuu-share-location-modal__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+
+  p {
+    margin: 0;
+  }
+}
+
+.kuu-share-location-modal__map {
+  position: relative;
+  align-self: center;
+  width: 256px;
+  height: 256px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--primary-low);
+
+  // 3×3 张图块，位置由 JS 算好（以地点为中心）
+  img {
+    position: absolute;
+    width: 256px;
+    height: 256px;
+    max-width: none;
+  }
+}
+
+// 地点永远在正中间：标记的尖端对准中心
+.kuu-share-location-modal__marker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  color: #e5484d;
+  font-size: 2em;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 40%));
+}
+
+.kuu-share-location-modal__name-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+  color: var(--primary-medium);
+  font-size: var(--font-down-1);
+
+  input {
+    margin: 0;
+    color: var(--primary);
+    font-size: var(--font-0);
+  }
+}
+
+.kuu-share-location-modal__notice {
+  display: flex;
+  gap: 0.4em;
+  align-items: center;
+  padding: 0.4em 0.6em;
+  border-radius: 6px;
+  background: rgb(192 209 228 / 45%);
+  color: $kuu-navy;
+  font-weight: 600;
+}
+
+.kuu-share-location-modal__attribution {
+  color: var(--primary-medium);
+  font-size: var(--font-down-2);
+}

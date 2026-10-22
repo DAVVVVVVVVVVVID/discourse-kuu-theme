@@ -75,3 +75,9 @@ share_image_brand:
 share_image_hint:
   default: "长按识别二维码，查看完整内容"
   description: "分享图底部大字下面的提示"
+chat_location_icon:
+  default: "location-dot"
+  description: "聊天输入框「位置」按钮和位置预览的图标"
+chat_location_current_icon:
+  default: "location-crosshairs"
+  description: "分享位置窗口里「使用我的当前位置」的图标"
