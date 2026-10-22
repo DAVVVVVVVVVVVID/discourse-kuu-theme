@@ -86,7 +86,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - FKB Pro 手机版给「全部 ▾」下拉写了 `display: flex !important`，选择器优先级是 (0,6,1)。要藏它，选择器路径里写全 `.list-controls .container .navigation-container`，再重复写一次类名
 - core 的「新建话题」按钮 `#create-topic` 外面包着一层组合按钮 `d-combo-button`，藏 `.navigation-controls` 里其他按钮时要留下包着它的那一层（`:has(#create-topic)`）
 - **WSL 里没有 Linux 版 node / pnpm**，检查在开发容器里跑：`docker exec -u discourse discourse_dev bash -lc 'cd /src/plugins/discourse-kuu-theme && pnpm install && pnpm lint'`
-- 本地把组件更新到开发环境（本地组件 ID 2）：`d/rails runner 'RemoteTheme.import_theme_from_directory("/src/plugins/discourse-kuu-theme", theme_id: 2)'`（会跳过 node_modules）。**本地分类 ID 和线上不一样**（本地二手 7、评分 5、评分对象 6），本地的主题设置要改成本地 ID。改了 CSS 后页面还是旧样式时，开发服务器缓存了旧样式表：要重启的话按 `~/.claude/CLAUDE.md` 用排队锁，并在回复里说明「重启了共用的开发服务器」
+- 本地把组件更新到开发环境（本地组件 ID 2）：`d/rails runner 'RemoteTheme.import_theme_from_directory("/src/plugins/discourse-kuu-theme", theme_id: 2)'`（会跳过 node_modules）。**本地分类 ID 和线上不一样**（本地二手 7、评分 5、评分对象 6），本地的主题设置要改成本地 ID。改了 CSS 后页面还是旧样式时，是开发服务器缓存了旧样式表（工作进程收不到清缓存的通知）。**不用重启**：`~/discourse/tmp/discourse-kuu-theme/theme-css.sh` 输出刚导入的样式表地址，Playwright 脚本里用 `page.route` 把 `/stylesheets/common_theme_2_*.css` 的请求改到这个地址（`unread-banner.mjs` 里有写法）。真要重启按 `~/.claude/CLAUDE.md` 用排队锁，并在回复里说明
 - （只在开发服务器没在跑时才启动）`d/dev` 要 TTY，后台跑用 `docker exec -u discourse:discourse -w /src discourse_dev bin/dev`
 - Playwright 截图不能 `waitUntil: "networkidle"`（Discourse 的长轮询一直不停），等页面元素出现（比如 `.kuu-waterfall`）
 - 本地用别的身份测（普通用户、管理员）：启动 `bin/dev` 时加 `-e DISCOURSE_DEV_ALLOW_ANON_TO_IMPERSONATE=1`，然后打开 `/session/用户名/become`
