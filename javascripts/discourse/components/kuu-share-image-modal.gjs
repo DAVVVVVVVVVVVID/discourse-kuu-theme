@@ -13,10 +13,12 @@ import DModal from "discourse/ui-kit/d-modal";
 import dLoadingSpinner from "discourse/ui-kit/helpers/d-loading-spinner";
 import { buildShareData } from "../lib/kuu-share-data.js";
 import { renderShareImage } from "../lib/kuu-share-image.js";
+import { reportShare } from "../lib/kuu-share-reward.js";
 
 const JPEG_QUALITY = 0.92;
 
 export default class KuuShareImageModal extends Component {
+  @service currentUser;
   @service site;
   @service siteSettings;
   @service toasts;
@@ -59,6 +61,10 @@ export default class KuuShareImageModal extends Component {
       this.canvas = canvas;
       this.imageUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
       this.file = new File([blob], this.filename, { type: "image/jpeg" });
+      // 手机上靠长按保存，没有按钮可以挂：图片生成出来就算转发（Issue #32）
+      if (this.site.mobileView) {
+        reportShare({ currentUser: this.currentUser, toasts: this.toasts });
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("kuu share image", error);
@@ -84,12 +90,13 @@ export default class KuuShareImageModal extends Component {
     );
     navigator.clipboard
       .write([new ClipboardItem({ "image/png": png })])
-      .then(() =>
+      .then(() => {
         this.toasts.success({
           duration: "short",
           data: { message: "已复制，可以直接粘贴" },
-        })
-      )
+        });
+        reportShare({ currentUser: this.currentUser, toasts: this.toasts });
+      })
       .catch((error) =>
         this.copyFailed(
           error?.name === "NotAllowedError"
@@ -112,6 +119,7 @@ export default class KuuShareImageModal extends Component {
   async share() {
     try {
       await navigator.share({ files: [this.file] });
+      reportShare({ currentUser: this.currentUser, toasts: this.toasts });
     } catch {
       // 用户取消分享
     }
