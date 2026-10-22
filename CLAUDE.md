@@ -27,7 +27,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 
 ## 本地预览
 
-- Discourse 开发环境在 WSL 的 `~/discourse`（`d/boot_dev`、`d/dev`，http://localhost:3000 ），用完 `d/shutdown_dev`
+- Discourse 开发环境在 WSL 的 `~/discourse`（http://localhost:3000 ）。**容器、开发服务器、测试数据库、内存是几个会话共用的，先读 `~/.claude/CLAUDE.md` 的公共规则**：容器 / 开发服务器在跑就直接用，不停、不重启（不要 `d/shutdown_dev`）；测试用 `kuu-rspec`（主题用第 7 个测试库）；Playwright 截图用 `flock ~/discourse/tmp/kuu-heavy.lock` 排队
 - 本地后台「外观 → 组件 → 安装 → 从 Git 仓库」装这个仓库，或者用官方 `discourse_theme watch .` 同步到本地开发环境（要本地的 API key）。**不要同步到线上论坛**
 - 本地没有 FKB Pro 的话也要装上（https://github.com/VaperinaDEV/fkb-pro-theme ），很多样式要在 FKB Pro 下面才对
 - 手机效果：浏览器开手机模拟，或者用开发容器里的 Playwright（`/src/node_modules/playwright`，`chromium.launch({ channel: "chromium" })`，`devices["iPhone 13"]`）截图
@@ -56,6 +56,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/components/kuu-waterfall-card.gjs` | 瀑布流卡片（封面、标题、作者、第一楼的赞；文字封面的卡片下面是正文开头 `excerpt` 而不是标题；二手价格状态；评分 / 置顶角标） |
 | `javascripts/discourse/lib/kuu-waterfall.js` | 哪些列表用瀑布流、封面选择（文字封面模板以后在 `textCoverFor` 里扩展）、分列高度估算 |
 | `javascripts/discourse/api-initializers/post-share-menu.gjs` | 帖子菜单：每一楼的「复制链接」按钮换成分享下拉菜单、回复按钮换图标（`post-menu-buttons` transformer） |
+| `javascripts/discourse/api-initializers/user-menu-profile-tab.gjs` | 点头像默认打开「个人资料」栏：core 写死默认是通知，在 `user-menu-tabs-list__after` 放一个空组件，渲染结束时点一下个人资料栏 |
 | `javascripts/discourse/api-initializers/open-topic-from-top.js` | 从列表点进帖子一律从第一楼开始：`registerCustomLastUnreadUrlCallback` 让 `lastUnreadUrl` 返回不带楼号的链接（core 和插件的列表链接都用它）。通知等指向某一楼的链接不受影响 |
 | `javascripts/discourse/api-initializers/topic-footer-share.js` | 话题最底部的「分享」换成分享菜单（所有话题）：core 的 `share-and-invite` 由 CSS 藏起来，注册同优先级的新按钮，点击用 `menu` 服务弹出菜单。core 分享窗口里的「邀请」随之去掉 |
 | `javascripts/discourse/components/kuu-share-menu.gjs` | 帖子菜单里的分享按钮（DMenu） |
@@ -85,12 +86,13 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - FKB Pro 手机版给「全部 ▾」下拉写了 `display: flex !important`，选择器优先级是 (0,6,1)。要藏它，选择器路径里写全 `.list-controls .container .navigation-container`，再重复写一次类名
 - core 的「新建话题」按钮 `#create-topic` 外面包着一层组合按钮 `d-combo-button`，藏 `.navigation-controls` 里其他按钮时要留下包着它的那一层（`:has(#create-topic)`）
 - **WSL 里没有 Linux 版 node / pnpm**，检查在开发容器里跑：`docker exec -u discourse discourse_dev bash -lc 'cd /src/plugins/discourse-kuu-theme && pnpm install && pnpm lint'`
-- 本地把组件更新到开发环境（本地组件 ID 2）：`d/rails runner 'RemoteTheme.import_theme_from_directory("/src/plugins/discourse-kuu-theme", theme_id: 2)'`（会跳过 node_modules）。**本地分类 ID 和线上不一样**（本地二手 7、评分 5），本地的主题设置要改成本地 ID。改了 CSS 后如果页面还是旧样式，重启 `d/dev`
-- `d/dev` 要 TTY，后台跑用 `docker exec -u discourse:discourse -w /src discourse_dev bin/dev`
+- 本地把组件更新到开发环境（本地组件 ID 2）：`d/rails runner 'RemoteTheme.import_theme_from_directory("/src/plugins/discourse-kuu-theme", theme_id: 2)'`（会跳过 node_modules）。**本地分类 ID 和线上不一样**（本地二手 7、评分 5、评分对象 6），本地的主题设置要改成本地 ID。改了 CSS 后页面还是旧样式时，开发服务器缓存了旧样式表：要重启的话按 `~/.claude/CLAUDE.md` 用排队锁，并在回复里说明「重启了共用的开发服务器」
+- （只在开发服务器没在跑时才启动）`d/dev` 要 TTY，后台跑用 `docker exec -u discourse:discourse -w /src discourse_dev bin/dev`
 - Playwright 截图不能 `waitUntil: "networkidle"`（Discourse 的长轮询一直不停），等页面元素出现（比如 `.kuu-waterfall`）
 - 本地用别的身份测（普通用户、管理员）：启动 `bin/dev` 时加 `-e DISCOURSE_DEV_ALLOW_ANON_TO_IMPERSONATE=1`，然后打开 `/session/用户名/become`
-- 停开发服务器别用 `pkill -f bin/dev`（会把执行它的 shell 自己也匹配上），用 `ps` 找进程号再 kill；`kill -9` 后前端构建进程 `rolldown.mjs` 可能还在，下次启动会报「already running」，要一起停掉
+- 不要 `pkill -f` / `kill` 别的会话的进程（`pkill -f bin/dev` 还会把执行它的 shell 自己也匹配上）。前端构建进程 `rolldown.mjs` 被强行停掉后，下次启动会报「already running」
 - canvas 只能导出没被「污染」的图：画进分享图的图片都要先 `fetch` 成 blob（`kuu-share-data.js` 的 `loadImage`），外链图读不到就当没有图
-- 分享图二维码的检查：`~/discourse/tmp/kuu-shots/` 里的 qr-check.mjs 用 jsQR 在浏览器里识别（验收标准：整张图缩到 540px 宽、再压成质量 50 的 JPEG 能识别，Issue #16），但**微信实机扫码只能 David 测**
-- WSL 内存小（约 5GB），开发服务器、Playwright、别的会话跑的 rspec 同时跑会把容器拖垮（`can't alloc thread`），截图脚本崩了要清掉残留的 chrome 进程
+- 分享图二维码的检查：`~/discourse/tmp/discourse-kuu-theme/` 里的 qr-check.mjs 用 jsQR 在浏览器里识别（验收标准：整张图缩到 540px 宽、再压成质量 50 的 JPEG 能识别，Issue #16），但**微信实机扫码只能 David 测**
+- WSL 内存小（约 5GB），开发服务器、Playwright、别的会话跑的 rspec 同时跑会把容器拖垮（`can't alloc thread`）。截图脚本、测试脚本放在 `~/discourse/tmp/discourse-kuu-theme/`（容器里 `/src/tmp/discourse-kuu-theme/`），跑之前看 `free -m`，用 `flock` 排队；脚本崩了只清理自己启动的 chrome 进程
+- 开发库是共用的：为测试改了站点设置、用户设置，测完改回来，在回复里写明
 - 站点的 CSP 没有限制 `frame-src`；B 站嵌入播放器在手机上显示「视频失效」（2026-10-20 试过 5 种写法都不行），别再走这条路
