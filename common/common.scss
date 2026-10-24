@@ -701,7 +701,8 @@ html.mobile-view {
 
 // ------------------------------------------------------------
 // 二手市场、评分中心做成「独立页面」（2026-10-22，Issue #20，配合 javascripts/.../standalone-categories.gjs）
-// - 侧边栏「话题」下面的入口：插件 API 加的链接默认排在 core 链接后面，这里用 order 挪到「话题」正下方
+// - 侧边栏「话题」下面的入口（二手市场、评分中心，以及 10-22 加的鲸币商城 Issue #35）：
+//   插件 API 加的链接默认排在 core 链接后面，这里用 order 挪到「话题」正下方，彼此之间保持注册顺序
 //   （「话题」的 data-list-item-name 是 everything）。侧边栏「类别」里藏掉它们的 CSS 由 JS 按设置生成
 // - 进入这些分类的列表页后（body.kuu-standalone-page），顶部这一行只留「‹ 首页」+ 标题和发帖按钮：
 //   「全部 ▾」下拉（连同快捷按钮）、「最新 / 热门」、分类的铃铛等其他按钮都藏起来。
@@ -720,7 +721,8 @@ html.mobile-view {
     order: 0;
   }
 
-  > li[data-list-item-name^="kuu-standalone-"] {
+  > li[data-list-item-name^="kuu-standalone-"],
+  > li[data-list-item-name="kuu-points-shop"] {
     order: 1;
   }
 }

@@ -48,7 +48,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 |---|---|
 | `common/common.scss` | 评分帖书签、顶部分类筛选和快捷按钮样式、卡片预览一行、隐藏新话题小蓝点、手机上插件表单全屏、手机底栏、手机分类标签、手机瀑布流 |
 | `javascripts/discourse/api-initializers/quick-categories.gjs` | 「全部 ▾」右边的快捷分类按钮（只在电脑上；图标 + 文字，图标和底栏一致） |
-| `javascripts/discourse/api-initializers/standalone-categories.gjs` | 二手市场、评分中心做成「独立页面」（设置 `standalone_category_ids`，子分类也算）：侧边栏「类别」里藏掉（按设置生成 CSS，按链接网址藏）、「全部 ▾」下拉里去掉（select-kit `replaceContent`）、侧边栏「话题」正下方加入口（`addCommunitySectionLink` + CSS `order`）；进去以后顶部只显示「‹ 首页」+ 标题（`after-breadcrumbs`，body 加 `kuu-standalone-page`），电脑保留发帖按钮 |
+| `javascripts/discourse/api-initializers/standalone-categories.gjs` | 二手市场、评分中心做成「独立页面」（设置 `standalone_category_ids`，子分类也算）：侧边栏「类别」里藏掉（按设置生成 CSS，按链接网址藏）、「全部 ▾」下拉里去掉（select-kit `replaceContent`）、侧边栏「话题」正下方加入口（`addCommunitySectionLink` + CSS `order`），后面还有「鲸币商城」（`/kuu-shop`，只在 `kuu_points_enabled` 开着时显示，按网址高亮）；进去以后顶部只显示「‹ 首页」+ 标题（`after-breadcrumbs`，body 加 `kuu-standalone-page`），电脑保留发帖按钮 |
 | `javascripts/discourse/lib/kuu-standalone.js` | 哪些分类是独立页面、它们的图标（底栏左右两个分类用底栏的图标） |
 | `javascripts/discourse/api-initializers/mobile-bottom-bar.gjs` | 手机底栏：首页、二手、中间「+」发帖、评分、我的；代替 FKB Pro 列表页的悬浮按钮 |
 | `javascripts/discourse/api-initializers/mobile-category-tabs.gjs` | 手机顶部分类标签（代替「全部 ▾」下拉框），挂 `after-breadcrumbs` |
@@ -72,7 +72,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/lib/kuu-share-image.js` | 分享图的 canvas 画法（1080×1440，三种样式，照 David 确认的参考图 `D:\PROJECT\KUU\brand\share\`）、中文换行 |
 | `javascripts/discourse/lib/kuu-share-data.js` | 分享图的数据：帖子、二手 `kuu_market_listing`、评分 `/kuu-ratings/boards/:id/items?sort=score`；图片都 fetch 成 blob 再画 |
 | `javascripts/discourse/lib/vendor/qrcode-generator.js` | 第三方二维码库（MIT），原样拷贝，eslint / prettier 跳过 |
-| `settings.yml` | `standalone_category_ids`、`quick_category_ids`、`bottom_bar_*`、`category_tabs_hidden_ids`、`waterfall_excluded_category_ids`、`text_cover_*`、`post_share_icon`、`post_reply_icon`、`share_image_*` |
+| `settings.yml` | `standalone_category_ids`、`sidebar_shop_*`、`quick_category_ids`、`bottom_bar_*`、`category_tabs_hidden_ids`、`waterfall_excluded_category_ids`、`text_cover_*`、`post_share_icon`、`post_reply_icon`、`share_image_*` |
 | `about.json` | modifier `topic_thumbnail_sizes: [[600, 1200]]`：列表数据里才有图片宽高和小缩略图（瀑布流按原图比例要用）；`serialize_topic_excerpts`：列表里带摘要（FKB Pro 也开了，这里再开一次，不依赖它） |
 
 和插件的配合：
@@ -97,7 +97,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - （只在开发服务器没在跑时才启动）`d/dev` 要 TTY，后台跑用 `docker exec -u discourse:discourse -w /src discourse_dev bin/dev`
 - Playwright 截图不能 `waitUntil: "networkidle"`（Discourse 的长轮询一直不停），等页面元素出现（比如 `.kuu-waterfall`）
 - 本地用别的身份测（普通用户、管理员）：启动 `bin/dev` 时加 `-e DISCOURSE_DEV_ALLOW_ANON_TO_IMPERSONATE=1`，然后打开 `/session/用户名/become`
-- **改站点设置，开发服务器的工作进程同样收不到**（比如打开 `kuu_points_enabled` 后接口还是 404）。不为这个重启共用服务器：测主题这边的反应时，在 Playwright 里用 `context.route` 按插件接口的格式模拟返回（`share-reward.mjs` 的 mock 模式）
+- **改站点设置，开发服务器的工作进程同样收不到**（比如打开 `kuu_points_enabled` 后接口还是 404）。不为这个重启共用服务器：测主题这边的反应时，在 Playwright 里用 `context.route` 按插件接口的格式模拟返回（`share-reward.mjs` 的 mock 模式）；要让前端以为某个设置开着，就改页面 HTML 里预加载的站点设置（`sidebar-shop.mjs`，那段 JSON 里是 `\"kuu_points_enabled\":false` 这种转义写法）。服务器那边插件关着时插件的前端路由也不存在
 - 不要 `pkill -f` / `kill` 别的会话的进程（`pkill -f bin/dev` 还会把执行它的 shell 自己也匹配上）。前端构建进程 `rolldown.mjs` 被强行停掉后，下次启动会报「already running」
 - canvas 只能导出没被「污染」的图：画进分享图的图片都要先 `fetch` 成 blob（`kuu-share-data.js` 的 `loadImage`），外链图读不到就当没有图
 - 分享图二维码的检查：`~/discourse/tmp/discourse-kuu-theme/` 里的 qr-check.mjs 用 jsQR 在浏览器里识别（验收标准：整张图缩到 540px 宽、再压成质量 50 的 JPEG 能识别，Issue #16），但**微信实机扫码只能 David 测**

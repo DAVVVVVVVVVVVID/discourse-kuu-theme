@@ -81,3 +81,9 @@ chat_location_icon:
 chat_location_current_icon:
   default: "location-crosshairs"
   description: "分享位置窗口里「使用我的当前位置」的图标"
+sidebar_shop_label:
+  default: "鲸币商城"
+  description: "侧边栏「话题」下面「鲸币商城」入口的文字（积分插件打开时才显示）"
+sidebar_shop_icon:
+  default: "coins"
+  description: "侧边栏「鲸币商城」入口的图标"
