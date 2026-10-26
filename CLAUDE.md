@@ -42,7 +42,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - 手机端专用的东西用 `site.mobileView` 判断（JS），或者 `html.mobile-view`（CSS）
 - 不引入外部脚本和字体
 
-## 现在有什么（2026-10-21）
+## 现在有什么（2026-10-26）
 
 | 文件 | 内容 |
 |---|---|
@@ -53,8 +53,10 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/api-initializers/mobile-bottom-bar.gjs` | 手机底栏：首页、二手、中间「+」发帖、评分、我的；代替 FKB Pro 列表页的悬浮按钮 |
 | `javascripts/discourse/api-initializers/mobile-category-tabs.gjs` | 手机顶部分类标签（代替「全部 ▾」下拉框），挂 `after-breadcrumbs` |
 | `javascripts/discourse/api-initializers/mobile-waterfall.gjs` | 手机两列瀑布流，挂 `before-topic-list`；同一个列表的 core 表格加 `.kuu-waterfall-source` 类名后由 CSS 藏起来 |
-| `javascripts/discourse/components/kuu-waterfall-card.gjs` | 瀑布流卡片（封面、标题、作者、第一楼的赞；文字封面的卡片下面是正文开头 `excerpt` 而不是标题；二手价格状态；评分 / 置顶角标） |
-| `javascripts/discourse/lib/kuu-waterfall.js` | 哪些列表用瀑布流、封面选择（文字封面模板以后在 `textCoverFor` 里扩展）、分列高度估算 |
+| `javascripts/discourse/components/kuu-waterfall-card.gjs` | 瀑布流卡片（封面、标题、作者、第一楼的赞；文字封面的卡片下面是正文开头 `excerpt` 而不是标题；二手价格状态；评分 / 置顶角标；搭子帖下面只有发起人和分类名） |
+| `javascripts/discourse/components/kuu-waterfall-buddy-cover.gjs` | 瀑布流里搭子帖的封面「信息卡」（Issue #37 方案 A）：状态胶囊、标题、时间、条件、成员头像 + 招募中的虚线空位、人数 |
+| `javascripts/discourse/lib/kuu-buddy.js` | 搭子帖共用：状态（`started_full` = 人满自动开始）、状态文字（搭子插件的 `kuu_buddy.card_statuses.*`，拿不到时用内置中文）、头像和空位个数 |
+| `javascripts/discourse/lib/kuu-waterfall.js` | 哪些列表用瀑布流、封面选择（文字封面模板以后在 `textCoverFor` 里扩展）、分列高度估算（搭子帖固定 3:4 信息卡） |
 | `javascripts/discourse/api-initializers/post-share-menu.gjs` | 帖子菜单：每一楼的「复制链接」按钮换成分享下拉菜单、回复按钮换图标（`post-menu-buttons` transformer） |
 | `javascripts/discourse/api-initializers/user-menu-profile-tab.gjs` | 点头像默认打开「个人资料」栏：core 写死默认是通知，在 `user-menu-tabs-list__after` 放一个空组件，渲染结束时点一下个人资料栏 |
 | `javascripts/discourse/api-initializers/chat-unread-banner.gjs` | 有未读私聊（直接对话频道）时页面顶部的提醒横条：去看看 / 忽略全部（标为已读）/ ×（只关这一次）。挂 `above-main-container`，数据来自 chat 插件的 `chatChannelsManager` |
@@ -69,8 +71,8 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 | `javascripts/discourse/components/kuu-share-menu-content.gjs` | 分享菜单的内容：复制链接、保存分享图（只在公开帖子）。帖子菜单和话题底部共用 |
 | `javascripts/discourse/components/kuu-share-image-modal.gjs` | 「保存分享图」弹窗：生成、显示（data URL，微信里能长按）、电脑上「复制图片」（剪贴板 PNG）、Web Share。原来的「下载图片」（`<a download href="data:…">`）会被 core 的全局链接拦截吞掉，已去掉 |
 | `javascripts/discourse/lib/kuu-share-reward.js` | 分享成功后报告 `discourse-kuu-points` 的「转发」每日任务（`POST /kuu-points/tasks/share.json`），奖励时提示经验和鲸币；404 / 网络错误一律忽略。复制链接、复制分享图、分享到…成功时调，手机上分享图生成出来就算 |
-| `javascripts/discourse/lib/kuu-share-image.js` | 分享图的 canvas 画法（1080×1440，三种样式，照 David 确认的参考图 `D:\PROJECT\KUU\brand\share\`）、中文换行 |
-| `javascripts/discourse/lib/kuu-share-data.js` | 分享图的数据：帖子、二手 `kuu_market_listing`、评分 `/kuu-ratings/boards/:id/items?sort=score`；图片都 fetch 成 blob 再画 |
+| `javascripts/discourse/lib/kuu-share-image.js` | 分享图的 canvas 画法（1080×1440，普通 / 二手 / 评分三种样式，照 David 确认的参考图 `D:\PROJECT\KUU\brand\share\`；搭子帖专用样式照 `D:\PROJECT\KUU\brand\buddy\buddy-cards.html`）、中文换行 |
+| `javascripts/discourse/lib/kuu-share-data.js` | 分享图的数据：帖子、二手 `kuu_market_listing`、评分 `/kuu-ratings/boards/:id/items?sort=score`、搭子帖子页的 `kuu_buddy_activity`；图片都 fetch 成 blob 再画 |
 | `javascripts/discourse/lib/vendor/qrcode-generator.js` | 第三方二维码库（MIT），原样拷贝，eslint / prettier 跳过 |
 | `settings.yml` | `standalone_category_ids`、`sidebar_shop_*`、`quick_category_ids`、`bottom_bar_*`、`category_tabs_hidden_ids`、`waterfall_excluded_category_ids`、`text_cover_*`、`post_share_icon`、`post_reply_icon`、`share_image_*` |
 | `about.json` | modifier `topic_thumbnail_sizes: [[600, 1200]]`：列表数据里才有图片宽高和小缩略图（瀑布流按原图比例要用）；`serialize_topic_excerpts`：列表里带摘要（FKB Pro 也开了，这里再开一次，不依赖它） |
@@ -78,7 +80,8 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 和插件的配合：
 - 底栏的「+」调用 `discourse-kuu-new-topic` 插件的 `service:kuu-new-topic` 的 `openNewTopic({ category, tag })`，没有时退回 `composer.openNewTopic`
 - 二手帖在列表里的商品卡片由 `discourse-kuu-market` 插件画；评分主题的卡片由 `discourse-kuu-ratings` 插件画（开发中）
-- 手机瀑布流在混合列表里读插件放进列表的字段：二手 `kuu_market_card`（`item_name`、`price`、`free`、`has_photos`）和 `kuu_market_status`，评分 `kuu_rating_board_card.items[0].image_url`（没有时用评分插件的 `kuu_ratings_placeholder_image`）；状态文字用二手插件的 `kuu_market.card_statuses.*`。插件改了这些字段要同步改 `lib/kuu-waterfall.js` 和 `kuu-waterfall-card.gjs`
+- 手机瀑布流在混合列表里读插件放进列表的字段：二手 `kuu_market_card`（`item_name`、`price`、`free`、`has_photos`）和 `kuu_market_status`，评分 `kuu_rating_board_card.items[0].image_url`（没有时用评分插件的 `kuu_ratings_placeholder_image`），搭子 `kuu_buddy_card`（`status`、`start_reason`、`schedule`、`requirements`、`capacity`、`member_count`、`members`）；状态文字用二手插件的 `kuu_market.card_statuses.*`。插件改了这些字段要同步改 `lib/kuu-waterfall.js`、`kuu-waterfall-card.gjs`、`kuu-waterfall-buddy-cover.gjs`
+- 搭子帖分享图读帖子页的 `kuu_buddy_activity`（搭子插件 TopicActivitySerializer：`organizer` 单独给，`members` 不含发起人、`spots_left`）
 - 注册等待页的激活码、倒计时由 `discourse-kuu-kyoto-email` 插件负责，这里不管
 
 ## 踩过的坑
@@ -96,6 +99,7 @@ pnpm lint:fix      # 自动修格式和能自动修的规则
 - 本地把组件更新到开发环境（本地组件 ID 2）：`d/rails runner 'RemoteTheme.import_theme_from_directory("/src/plugins/discourse-kuu-theme", theme_id: 2)'`（会跳过 node_modules）。**本地分类 ID 和线上不一样**（本地二手 7、评分 5、评分对象 6），本地的主题设置要改成本地 ID。改了 CSS 后页面还是旧样式时，是开发服务器缓存了旧样式表（工作进程收不到清缓存的通知）。**不用重启**：`~/discourse/tmp/discourse-kuu-theme/theme-css.sh` 输出刚导入的样式表地址，Playwright 脚本里用 `page.route` 把 `/stylesheets/common_theme_2_*.css` 的请求改到这个地址（`unread-banner.mjs` 里有写法）。真要重启按 `~/.claude/CLAUDE.md` 用排队锁，并在回复里说明
 - （只在开发服务器没在跑时才启动）`d/dev` 要 TTY，后台跑用 `docker exec -u discourse:discourse -w /src discourse_dev bin/dev`
 - Playwright 截图不能 `waitUntil: "networkidle"`（Discourse 的长轮询一直不停），等页面元素出现（比如 `.kuu-waterfall`）
+- 本地没有插件数据时，在 Playwright 里用 `page.route` 改 `/latest.json`、`/t/…/:id.json` 注入插件字段（`buddy.mjs`）。**进帖子要走 Ember 路由**（`Discourse.__container__.lookup("service:router").transitionTo(...)`）：整页打开或点页面外加的链接时，帖子数据预载在 HTML 里，不经过 `.json`，注入不进去
 - 本地用别的身份测（普通用户、管理员）：启动 `bin/dev` 时加 `-e DISCOURSE_DEV_ALLOW_ANON_TO_IMPERSONATE=1`，然后打开 `/session/用户名/become`
 - **改站点设置，开发服务器的工作进程同样收不到**（比如打开 `kuu_points_enabled` 后接口还是 404）。不为这个重启共用服务器：测主题这边的反应时，在 Playwright 里用 `context.route` 按插件接口的格式模拟返回（`share-reward.mjs` 的 mock 模式）；要让前端以为某个设置开着，就改页面 HTML 里预加载的站点设置（`sidebar-shop.mjs`，那段 JSON 里是 `\"kuu_points_enabled\":false` 这种转义写法）。服务器那边插件关着时插件的前端路由也不存在
 - 不要 `pkill -f` / `kill` 别的会话的进程（`pkill -f bin/dev` 还会把执行它的 shell 自己也匹配上）。前端构建进程 `rolldown.mjs` 被强行停掉后，下次启动会报「already running」

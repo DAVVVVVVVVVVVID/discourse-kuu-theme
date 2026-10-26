@@ -2,6 +2,7 @@
 // 文字封面上已经是大字标题，下面改成正文开头两行（没有摘要就不显示，PR #11 审核 David 定）。
 // 二手帖标题换成商品名（标题里本来带着【出售】和价格，和下面的价格、状态重复），
 // 下面加价格和状态；评分主题、置顶帖在封面上加角标。
+// 搭子帖（Issue #37）：封面是信息卡（kuu-waterfall-buddy-cover.gjs），下面只放发起人和分类名，不重复标题、不显示赞。
 // 整张卡片是一个链接，作者不单独做链接（链接里不能再套链接）
 import Component from "@glimmer/component";
 import { trustHTML } from "@ember/template";
@@ -9,6 +10,7 @@ import { or } from "discourse/truth-helpers";
 import dAvatar from "discourse/ui-kit/helpers/d-avatar";
 import dIcon from "discourse/ui-kit/helpers/d-icon";
 import { i18n } from "discourse-i18n";
+import KuuWaterfallBuddyCover from "./kuu-waterfall-buddy-cover.gjs";
 
 export default class KuuWaterfallCard extends Component {
   get topic() {
@@ -37,6 +39,10 @@ export default class KuuWaterfallCard extends Component {
   }
 
   get badge() {
+    // 搭子帖封面左上角是状态胶囊，不再叠角标
+    if (this.cover.buddy) {
+      return;
+    }
     if (this.topic.pinned) {
       return "置顶";
     }
@@ -73,10 +79,14 @@ export default class KuuWaterfallCard extends Component {
       href={{this.url}}
     >
       <span
-        class="kuu-wf-card__cover {{if this.cover.textCover '--text'}}"
+        class="kuu-wf-card__cover
+          {{if this.cover.textCover '--text'}}
+          {{if this.cover.buddy '--buddy'}}"
         style={{this.coverStyle}}
       >
-        {{#if this.cover.textCover}}
+        {{#if this.cover.buddy}}
+          <KuuWaterfallBuddyCover @topic={{this.topic}} />
+        {{else if this.cover.textCover}}
           <span class="kuu-wf-card__cover-title">
             <span class="kuu-wf-card__cover-text">
               {{#if this.itemName}}
@@ -95,7 +105,18 @@ export default class KuuWaterfallCard extends Component {
       </span>
 
       <span class="kuu-wf-card__body">
-        {{#if this.cover.textCover}}
+        {{#if this.cover.buddy}}
+          <span class="kuu-wf-card__meta">
+            <span class="kuu-wf-card__author">
+              {{dAvatar this.topic.creator imageSize="small" hideTitle=true}}
+              <span class="kuu-wf-card__username">
+                {{or this.topic.creator.name this.topic.creator.username}}
+                ·
+                {{this.topic.category.name}}
+              </span>
+            </span>
+          </span>
+        {{else if this.cover.textCover}}
           {{#if this.topic.hasExcerpt}}
             <span class="kuu-wf-card__excerpt">
               {{trustHTML this.topic.escapedExcerpt}}
@@ -124,18 +145,20 @@ export default class KuuWaterfallCard extends Component {
           </span>
         {{/if}}
 
-        <span class="kuu-wf-card__meta">
-          <span class="kuu-wf-card__author">
-            {{dAvatar this.topic.creator imageSize="small" hideTitle=true}}
-            <span class="kuu-wf-card__username">
-              {{or this.topic.creator.name this.topic.creator.username}}
+        {{#unless this.cover.buddy}}
+          <span class="kuu-wf-card__meta">
+            <span class="kuu-wf-card__author">
+              {{dAvatar this.topic.creator imageSize="small" hideTitle=true}}
+              <span class="kuu-wf-card__username">
+                {{or this.topic.creator.name this.topic.creator.username}}
+              </span>
+            </span>
+            <span class="kuu-wf-card__likes">
+              {{dIcon "d-unliked"}}
+              {{this.topic.op_like_count}}
             </span>
           </span>
-          <span class="kuu-wf-card__likes">
-            {{dIcon "d-unliked"}}
-            {{this.topic.op_like_count}}
-          </span>
-        </span>
+        {{/unless}}
       </span>
     </a>
   </template>

@@ -4,8 +4,10 @@
 // - 二手：discourse-kuu-market 放在帖子上的 kuu_market_listing（价格的写法和插件列表卡片的 card_price 一致）
 // - 评分主题：discourse-kuu-ratings 的 /kuu-ratings/boards/:id/items?sort=score（已经按平均分从高到低）
 import { ajax } from "discourse/lib/ajax";
+import { avatarUrl } from "discourse/lib/avatar-utils";
 import { emojiUnescape } from "discourse/lib/text";
 import { i18n } from "discourse-i18n";
+import { buddyStatusKey, buddyStatusLabel } from "./kuu-buddy.js";
 import { textTokens } from "./kuu-share-image.js";
 import { textCoverFor } from "./kuu-waterfall.js";
 
@@ -283,26 +285,69 @@ function shareUrl(topic) {
 }
 
 // 返回 kuu-share-image.js 的 renderShareImage 要的数据
+// 搭子帖（Issue #37）：discourse-kuu-buddy 放在帖子上的 kuu_buddy_activity（organizer、members、capacity、
+// schedule、requirements、status、start_reason…）。成员头像最多读 BUDDY_MAX_AVATARS 张，发起人在最前
+const BUDDY_MAX_AVATARS = 8;
+
+async function buddyData(topic, activity) {
+  const key = buddyStatusKey(activity.status, activity.start_reason);
+  const ended = ["ended", "expired"].includes(activity.status);
+  const people = [activity.organizer, ...(activity.members || [])].filter(
+    Boolean
+  );
+  const avatars = await Promise.all(
+    people
+      .slice(0, BUDDY_MAX_AVATARS)
+      .map((user) => loadImage(avatarUrl(user.avatar_template, "large")))
+  );
+  const organizer = activity.organizer || {};
+
+  return {
+    type: "buddy",
+    statusKey: ended ? "ended" : key,
+    // 已结束、过期一律写「已结束」
+    statusLabel: buddyStatusLabel(ended ? "ended" : key),
+    titleTokens: await topicTitleTokens(topic),
+    organizerName: organizer.name || organizer.username || "",
+    organizerAvatar: avatars[0],
+    categoryName: topic.category?.name || "",
+    schedule: activity.schedule,
+    capacity: activity.capacity,
+    requirements: activity.requirements,
+    memberCount: activity.member_count,
+    spotsLeft: activity.spots_left,
+    avatars,
+    hint:
+      activity.status === "recruiting"
+        ? settings.share_image_buddy_hint_recruiting
+        : settings.share_image_buddy_hint_other,
+  };
+}
+
 export async function buildShareData(topic, siteSettings) {
   const listing = topic.kuu_market_listing;
+  const buddy = topic.kuu_buddy_activity;
   const [content, logo] = await Promise.all([
-    listing
-      ? marketData(topic, listing, siteSettings)
-      : isBoard(topic, siteSettings)
-        ? ratingsData(topic, siteSettings)
-        : normalData(topic),
+    buddy
+      ? buddyData(topic, buddy)
+      : listing
+        ? marketData(topic, listing, siteSettings)
+        : isBoard(topic, siteSettings)
+          ? ratingsData(topic, siteSettings)
+          : normalData(topic),
     loadImage(
       siteSettings.site_large_icon_url || siteSettings.site_logo_small_url
     ),
   ]);
 
   return {
-    ...content,
     url: shareUrl(topic),
     author:
       topic.details?.created_by?.username || topic.creator?.username || "",
     brand: settings.share_image_brand,
     hint: settings.share_image_hint,
     logo,
+    // 搭子帖的底部提示按状态换，所以内容放在后面覆盖
+    ...content,
   };
 }

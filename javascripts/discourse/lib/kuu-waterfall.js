@@ -74,9 +74,14 @@ export function textCoverFor(topic) {
   return PLACEHOLDER_PALETTES[topic.id % PLACEHOLDER_PALETTES.length];
 }
 
-// 返回 { url, ratio }；没有可用的图时返回 { textCover, ratio }
+// 返回 { url, ratio }；没有可用的图时返回 { textCover, ratio }；搭子帖返回 { buddy: true, ratio }
 export function coverFor(topic, siteSettings) {
   let image;
+
+  // 搭子帖：信息卡封面（Issue #37），固定 3:4
+  if (topic.kuu_buddy_card) {
+    return { buddy: true, ratio: TEXT_COVER_RATIO };
+  }
 
   if (topic.kuu_rating_board_card) {
     // 评分主题：第一个评分对象的图，没有时用评分插件的占位图
@@ -97,6 +102,10 @@ export function coverFor(topic, siteSettings) {
 // 分列用的卡片高度估算（px）。只看已有的数据，不量 DOM：同样的帖子永远算出同样的高度，
 // 加载更多时前面的卡片不会换列
 export function estimateCardHeight(topic, cover, cardWidth) {
+  // 搭子帖卡片下面只有发起人一行
+  if (cover.buddy) {
+    return cardWidth * cover.ratio + 16 + 30;
+  }
   const textWidth = cardWidth - 16;
   // 中文一个字约 15px 宽；标题、摘要都最多两行。文字封面下面是摘要（可能没有），其他是标题
   const text = cover.textCover
