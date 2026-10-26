@@ -534,10 +534,182 @@ function drawRatings(ctx, data) {
   });
 }
 
+// 搭子帖（Issue #37，效果图 D:\PROJECT\KUU\brand\buddy\buddy-cards.html 的分享图，去掉了圆环装饰）：
+// 顶部藏青块放状态、标题、发起人；中间米白底写时间 / 人数 / 条件；下面白色块是成员头像叠放 + 虚线空位和人数。
+// 最长的情况（标题两行、三行信息各两行）也在 CONTENT_BOTTOM 以内
+const BUDDY_STATUS_COLORS = {
+  recruiting: { bg: SAKURA, fg: WHITE },
+  started: { bg: WHITE, fg: NAVY },
+  started_full: { bg: WHITE, fg: NAVY },
+  ended: { bg: "#9aa3b0", fg: WHITE },
+};
+const BUDDY_GREEN = "#1e7b3c";
+const BUDDY_INK = "#1f2328";
+
+function statusPill(ctx, text, x, y, { bg, fg }) {
+  ctx.font = font(30, true);
+  const h = 56;
+  const w = ctx.measureText(text).width + 48;
+  fillRoundRect(ctx, x, y, w, h, h / 2, bg);
+  ctx.fillStyle = fg;
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, x + 24, y + h / 2 + 1);
+  ctx.textBaseline = "top";
+}
+
+function circleAvatar(ctx, image, cx, cy, d, ring) {
+  ctx.beginPath();
+  ctx.arc(cx, cy, d / 2 + 4, 0, Math.PI * 2);
+  ctx.fillStyle = ring;
+  ctx.fill();
+  if (image) {
+    drawCoverImage(ctx, image, cx - d / 2, cy - d / 2, d, d, d / 2);
+  } else {
+    ctx.beginPath();
+    ctx.arc(cx, cy, d / 2, 0, Math.PI * 2);
+    ctx.fillStyle = MIST;
+    ctx.fill();
+  }
+}
+
+function emptySeat(ctx, cx, cy, d) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, d / 2 - 2, 0, Math.PI * 2);
+  ctx.setLineDash([8, 6]);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#b8c3d1";
+  ctx.stroke();
+  ctx.restore();
+}
+
+// 白色块右边的文字：[主要文字, 强调文字, 强调颜色]
+function buddyCount(data) {
+  const { statusKey, memberCount, capacity, spotsLeft } = data;
+  if (statusKey === "ended") {
+    return [`已加入 ${memberCount} 人`, "已结束", GREY];
+  }
+  if (memberCount >= capacity) {
+    return [
+      `${memberCount} 人已满`,
+      statusKey === "recruiting" ? "已满" : "活动开始",
+      BUDDY_GREEN,
+    ];
+  }
+  if (statusKey === "recruiting") {
+    return [`已加入 ${memberCount} 人`, `还差 ${spotsLeft} 人`, SAKURA];
+  }
+  return [`已加入 ${memberCount} 人`, "活动开始", NAVY];
+}
+
+function drawBuddy(ctx, data) {
+  const width = WIDTH - 2 * M;
+  const pad = 48;
+
+  // 先算顶部块的高度
+  ctx.font = font(64, true);
+  const titleLines = wrap(ctx, data.titleTokens, width - 2 * pad, 2, 64);
+  const pillY = M + pad;
+  const titleY = pillY + 56 + 28;
+  const orgY = titleY + titleLines.length * 84 + 20;
+  const bannerBottom = orgY + 52 + 44;
+
+  fillRoundRect(ctx, M, M, width, bannerBottom - M, 28, NAVY);
+  statusPill(
+    ctx,
+    data.statusLabel,
+    M + pad,
+    pillY,
+    BUDDY_STATUS_COLORS[data.statusKey] || BUDDY_STATUS_COLORS.ended
+  );
+  paragraph(ctx, data.titleTokens, {
+    x: M + pad,
+    y: titleY,
+    width: width - 2 * pad,
+    size: 64,
+    bold: true,
+    color: WHITE,
+    maxLines: 2,
+    lineHeight: 84,
+  });
+  circleAvatar(ctx, data.organizerAvatar, M + pad + 26, orgY + 26, 52, NAVY);
+  singleLine(ctx, `${data.organizerName} 发起 · ${data.categoryName}`, {
+    x: M + pad + 52 + 16,
+    y: orgY + 10,
+    width: width - 2 * pad - 68,
+    size: 32,
+    color: MIST,
+  });
+
+  // 中间三行：时间 / 人数 / 条件（条件为空不写）
+  let y = bannerBottom + 52;
+  const rows = [
+    ["时间", data.schedule || "待商量"],
+    ["人数", `${data.capacity} 人（含发起人）`],
+    ["条件", data.requirements],
+  ].filter(([, value]) => value);
+  for (const [label, value] of rows) {
+    singleLine(ctx, label, {
+      x: M + 8,
+      y: y + 2,
+      width: 130,
+      size: 34,
+      color: GREY,
+    });
+    y = paragraph(ctx, textTokens(value), {
+      x: M + 150,
+      y,
+      width: width - 150,
+      size: 36,
+      color: BUDDY_INK,
+      maxLines: 2,
+      lineHeight: 52,
+    });
+    y += 18;
+  }
+
+  // 白色块：头像叠放 + 虚线空位，右边人数
+  const boxY = y + 22;
+  const boxH = 140;
+  fillRoundRect(ctx, M, boxY, width, boxH, 28, WHITE);
+  const [main, em, emColor] = buddyCount(data);
+  ctx.font = font(40, true);
+  const mainW = ctx.measureText(main).width;
+  const emW = ctx.measureText(em).width;
+  const textRight = WIDTH - M - 36;
+  const textLeft = textRight - mainW - 16 - emW;
+  const textY = boxY + boxH / 2 - 22;
+  ctx.fillStyle = NAVY;
+  ctx.fillText(main, textLeft, textY);
+  ctx.fillStyle = emColor;
+  ctx.fillText(em, textRight - emW, textY);
+
+  const d = 76;
+  const step = 54;
+  const startX = M + 36 + d / 2;
+  const cy = boxY + boxH / 2;
+  const room = Math.max(
+    1,
+    Math.floor((textLeft - 24 - d / 2 - startX) / step) + 1
+  );
+  const avatars = data.avatars.slice(0, room);
+  const empties =
+    data.statusKey === "recruiting"
+      ? Math.max(0, Math.min(data.spotsLeft, room - avatars.length))
+      : 0;
+  avatars.forEach((image, i) =>
+    circleAvatar(ctx, image, startX + i * step, cy, d, WHITE)
+  );
+  for (let i = 0; i < empties; i++) {
+    emptySeat(ctx, startX + (avatars.length + i) * step, cy, d);
+  }
+}
+
 const DRAWERS = {
   normal: drawNormal,
   market: drawMarket,
   ratings: drawRatings,
+  buddy: drawBuddy,
 };
 
 // data 的结构见 kuu-share-data.js 的 buildShareData。返回画好的 <canvas>

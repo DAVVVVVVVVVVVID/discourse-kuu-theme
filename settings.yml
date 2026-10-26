@@ -87,3 +87,9 @@ sidebar_shop_label:
 sidebar_shop_icon:
   default: "coins"
   description: "侧边栏「鲸币商城」入口的图标"
+share_image_buddy_hint_recruiting:
+  default: "扫码申请加入"
+  description: "搭子帖分享图底部的提示（招募中）"
+share_image_buddy_hint_other:
+  default: "扫码看看搭子广场"
+  description: "搭子帖分享图底部的提示（活动开始、已结束）"
