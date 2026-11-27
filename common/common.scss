@@ -148,19 +148,19 @@ $kuu-cream: #fcf9f2; // 米白：Logo 底色
 
   &:hover,
   &:focus {
-    color: $kuu-navy;
+    color: var(--kuu-reading-brand-text, #{$kuu-navy});
 
     .d-icon {
-      color: $kuu-navy;
+      color: var(--kuu-reading-brand-text, #{$kuu-navy});
     }
   }
 
   &.--active {
-    color: $kuu-navy;
+    color: var(--kuu-reading-brand-text, #{$kuu-navy});
     font-weight: 700;
 
     .d-icon {
-      color: $kuu-navy;
+      color: var(--kuu-reading-brand-text, #{$kuu-navy});
     }
   }
 }
@@ -271,7 +271,7 @@ html.mobile-view {
   }
 
   &.--active {
-    color: $kuu-navy;
+    color: var(--kuu-reading-brand-text, #{$kuu-navy});
     font-weight: 700;
   }
 
@@ -600,7 +600,7 @@ html.mobile-view {
 
   &.kuu-market-status-selling,
   &.kuu-market-status-buying {
-    color: $kuu-navy;
+    color: var(--kuu-reading-brand-text, #{$kuu-navy});
   }
 }
 
@@ -770,7 +770,7 @@ body.kuu-standalone-page .list-controls .navigation-container {
 
   &:hover,
   &:focus {
-    color: $kuu-navy;
+    color: var(--kuu-reading-brand-text, #{$kuu-navy});
   }
 }
 
@@ -803,7 +803,7 @@ body.kuu-standalone-page .list-controls .navigation-container {
   padding: 0.6em 0.75em 0.6em 1em;
   border-radius: 8px;
   background: rgb(192 209 228 / 45%); // 浅雾蓝
-  color: $kuu-navy;
+  color: var(--kuu-reading-brand-text, #{$kuu-navy});
 }
 
 .kuu-chat-unread-banner__text {
@@ -831,10 +831,10 @@ body.kuu-standalone-page .list-controls .navigation-container {
   }
 
   .btn-flat {
-    color: $kuu-navy;
+    color: var(--kuu-reading-brand-text, #{$kuu-navy});
 
     .d-icon {
-      color: $kuu-navy;
+      color: var(--kuu-reading-brand-text, #{$kuu-navy});
     }
   }
 }
@@ -982,7 +982,7 @@ html.mobile-view .kuu-chat-unread-banner {
   padding: 0.4em 0.6em;
   border-radius: 6px;
   background: rgb(192 209 228 / 45%);
-  color: $kuu-navy;
+  color: var(--kuu-reading-brand-text, #{$kuu-navy});
   font-weight: 600;
 }
 
@@ -1029,7 +1029,7 @@ html.desktop-view .topic-list .main-link .tli-middle-section {
 // 内容绝对定位铺满；内容太多时被封面框裁掉，不会把卡片撑高（分列高度按 3:4 估算）
 // ------------------------------------------------------------
 .kuu-wf-card__cover.--buddy {
-  background: $kuu-cream;
+  background: var(--kuu-reading-surface, #{$kuu-cream});
 }
 
 .kuu-wf-buddy {
@@ -1071,7 +1071,7 @@ html.desktop-view .topic-list .main-link .tli-middle-section {
   -webkit-line-clamp: 3;
   line-clamp: 3;
   overflow: hidden;
-  color: $kuu-navy;
+  color: var(--kuu-reading-brand-text, #{$kuu-navy});
   font-size: var(--font-up-1);
   font-weight: 800;
   line-height: 1.3;
@@ -1130,7 +1130,7 @@ html.desktop-view .topic-list .main-link .tli-middle-section {
 }
 
 .kuu-wf-buddy__count {
-  color: $kuu-navy;
+  color: var(--kuu-reading-brand-text, #{$kuu-navy});
   font-size: var(--font-down-1);
   font-weight: 700;
 
@@ -1143,4 +1143,91 @@ html.desktop-view .topic-list .main-link .tli-middle-section {
       color: #1e7b3c;
     }
   }
+}
+
+// 阅读模式：统一页首入口和 FKB Pro 护眼配色，沿用原生调色板（2026-11-23）。
+// 顶部统一由阅读模式入口负责；侧栏原生入口仍可使用“跟随系统”。
+:root:has(.kuu-reading-mode) .d-header-icons > .header-color-scheme-toggle {
+  display: none;
+}
+
+// FKB Pro 的留白和按钮使用独立变量，也需要随护眼配色变化。
+:root:has(.kuu-reading-mode[data-mode="eye"]) {
+  --fkb-bg: color-mix(in srgb, var(--secondary) 94%, var(--primary) 6%);
+  --fkb-header-btn: var(--primary-very-low);
+  --fkb-header-btn-hover: var(--primary-low);
+  --fkb-btn: var(--primary-very-low);
+  --fkb-btn-hover: var(--primary-low);
+}
+
+.kuu-reading-mode__menu {
+  min-width: 12rem;
+  max-width: min(18rem, calc(100vw - 2rem));
+  padding: 0.5rem;
+  color: var(--primary);
+  background: var(--secondary);
+  border-radius: var(--d-default-border-radius);
+}
+
+.kuu-reading-mode__title {
+  margin: 0.25rem 0.5rem 0.5rem;
+  color: var(--primary-high);
+  font-size: var(--font-down-1);
+}
+
+.kuu-reading-mode__option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.75rem;
+  color: var(--primary);
+  text-align: start;
+  border-radius: var(--d-default-border-radius);
+
+  > span {
+    flex: 1;
+  }
+
+  .d-icon {
+    color: currentcolor;
+  }
+
+  &[aria-checked="true"] {
+    color: var(--tertiary);
+    background: var(--tertiary-low);
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: var(--d-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tertiary);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+}
+
+.kuu-reading-mode__error {
+  margin: 0.5rem;
+  color: var(--danger);
+  font-size: var(--font-down-1);
+}
+
+// 阅读模式：让品牌文字和信息卡在深色背景下可读，日间保留原品牌色（2026-11-23）。
+:root:has(.kuu-reading-mode[data-mode="night"]) {
+  --kuu-reading-brand-text: var(--primary);
+  --kuu-reading-surface: var(--secondary);
+}
+
+// 阅读模式：护眼状态下的信息卡使用相同的浅绿色底色（2026-11-23）。
+:root:has(.kuu-reading-mode[data-mode="eye"]) {
+  --kuu-reading-surface: var(--secondary);
 }
