@@ -20,6 +20,7 @@ RSpec.describe "KUU reading mode" do
     theme = RemoteTheme.import_theme_from_directory(directory)
     theme.update_setting(:eye_comfort_palette_id, eye_palette.id)
     theme.update_setting(:reading_mode_enabled, true)
+    theme.save!
     Theme.find_default.child_themes << theme
     theme
   end
@@ -208,6 +209,7 @@ RSpec.describe "KUU reading mode" do
 
   it "disables unavailable modes instead of applying a broken palette" do
     component.update_setting(:eye_comfort_palette_id, 0)
+    component.save!
     Theme.find_default.update!(dark_color_scheme_id: nil)
     visit("/latest")
     find(".kuu-reading-mode__trigger").click
@@ -232,6 +234,7 @@ RSpec.describe "KUU reading mode" do
 
   it "keeps the native selector when the reading mode setting is disabled" do
     component.update_setting(:reading_mode_enabled, false)
+    component.save!
     visit("/latest")
     expect(page).to have_no_css(".kuu-reading-mode")
     expect(page).to have_css(".header-color-scheme-toggle")
