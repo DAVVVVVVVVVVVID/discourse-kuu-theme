@@ -1,2 +1,10 @@
 zh_CN:
   chat_share_location: "位置"
+  reading_mode:
+    title: "阅读模式"
+    current: "阅读模式：%{mode}"
+    day: "日间模式"
+    eye: "护眼模式"
+    night: "夜间模式"
+    unavailable: "暂不可用"
+    error: "切换失败，当前配色已保留，请重试。"

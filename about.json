@@ -8,6 +8,7 @@
   "maximum_discourse_version": null,
   "modifiers": {
     "serialize_topic_excerpts": true,
-    "topic_thumbnail_sizes": [[600, 1200]]
+    "topic_thumbnail_sizes": [[600, 1200]],
+    "svg_icons": ["sun", "leaf", "moon", "check"]
   }
 }

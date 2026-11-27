@@ -1,2 +1,10 @@
 en:
   chat_share_location: "Location"
+  reading_mode:
+    title: "Reading mode"
+    current: "Reading mode: %{mode}"
+    day: "Day mode"
+    eye: "Eye comfort"
+    night: "Night mode"
+    unavailable: "Unavailable"
+    error: "Couldn't switch modes. Your current colors are unchanged. Please try again."
