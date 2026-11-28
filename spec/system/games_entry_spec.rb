@@ -35,7 +35,13 @@ RSpec.describe "KUU games entry" do
   end
 
   it "hides an enabled entry when the URL is empty, invalid or unsafe" do
-    ["", "not a url", "http://example.com/game", "javascript:alert(1)", "https://name:secret@example.com/"].each do |url|
+    [
+      "",
+      "not a url",
+      "http://example.com/game",
+      "javascript:alert(1)",
+      "https://name:secret@example.com/",
+    ].each do |url|
       configure_entry(enabled: true, url:)
       visit("/latest")
       expect(page).to have_no_css(entry, visible: :all)
