@@ -93,3 +93,16 @@ share_image_buddy_hint_recruiting:
 share_image_buddy_hint_other:
   default: "扫码看看搭子广场"
   description: "搭子帖分享图底部的提示（活动开始、已结束）"
+
+games_enabled:
+  default: false
+  description: "在电脑侧栏和手机社区菜单显示小游戏入口；请先配置可公开访问的 HTTPS 地址，再启用"
+games_url:
+  default: ""
+  description: "独立小游戏页面的正式 HTTPS 地址；留空、地址无效或含账号密码时不显示入口"
+games_label:
+  default: "小游戏"
+  description: "社区菜单中小游戏入口的文字"
+games_icon:
+  default: "gamepad"
+  description: "小游戏入口图标（Font Awesome 名称）"
